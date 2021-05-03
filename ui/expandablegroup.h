@@ -14,6 +14,7 @@ private:
 	QToolButton* m_button;
 	QParallelAnimationGroup* m_animation;
 	QScrollArea* m_content;
+	QLayout* m_contentLayout;
 	int m_duration = 100;
 
 private Q_SLOTS:
@@ -21,7 +22,9 @@ private Q_SLOTS:
 
 public:
 	explicit ExpandableGroup(const QString& title = "", QWidget* parent = nullptr);
+	void setContentWidget(QWidget* contentWidget);
 	void setContentLayout(QLayout* contentLayout);
 	void setTitle(const QString& title) { m_button->setText(title); }
 	void toggle(bool expanded);
+	void resizeLayout();
 };

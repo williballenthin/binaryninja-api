@@ -23,6 +23,10 @@ examples/triage/moc_predefs.h
 examples/triage/moc_predefs.h.cbt
 examples/triage/triage.dll
 examples/triage/triage.lib
+examples/customtabitem/moc_predefs.h
+examples/customtabitem/moc_predefs.h.cbt
+examples/customtabitem/customtabitem.dll
+examples/customtabitem/customtabitem.lib
 libbinaryninja*
 python/_binaryninjacore.py
 python/enums.py
