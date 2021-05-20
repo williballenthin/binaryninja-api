@@ -1,0 +1,12 @@
+[package]
+name = "parse_dwarf"
+version = "0.1.0"
+authors = ["KyleMiles <kyle@vector35.com>"]
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+gimli = "0.26.1" 
+binaryninja = { path = "../../" }
