@@ -55,6 +55,7 @@ unordered_map<MediumLevelILOperandUsage, MediumLevelILOperandType>
 		{LowSSAVariableMediumLevelOperandUsage, VariableMediumLevelOperand},
 		{OffsetMediumLevelOperandUsage, IntegerMediumLevelOperand},
 		{ConstantMediumLevelOperandUsage, IntegerMediumLevelOperand},
+		{PossibleValueSetMediumLevelOperandUsage, PossibleValueSetMediumLevelOperand},
 		{VectorMediumLevelOperandUsage, IntegerMediumLevelOperand},
 		{IntrinsicMediumLevelOperandUsage, IntrinsicMediumLevelOperand},
 		{TargetMediumLevelOperandUsage, IndexMediumLevelOperand},
@@ -174,6 +175,7 @@ unordered_map<BNMediumLevelILOperation, vector<MediumLevelILOperandUsage>>
 		{MLIL_EXTERN_PTR, {ConstantMediumLevelOperandUsage, OffsetMediumLevelOperandUsage}},
 		{MLIL_FLOAT_CONST, {ConstantMediumLevelOperandUsage}},
 		{MLIL_IMPORT, {ConstantMediumLevelOperandUsage}},
+		{MLIL_POSSIBLE_VALUE_SET, {PossibleValueSetMediumLevelOperandUsage}},
 		{MLIL_ADD, {LeftExprMediumLevelOperandUsage, RightExprMediumLevelOperandUsage}},
 		{MLIL_SUB, {LeftExprMediumLevelOperandUsage, RightExprMediumLevelOperandUsage}},
 		{MLIL_AND, {LeftExprMediumLevelOperandUsage, RightExprMediumLevelOperandUsage}},
@@ -742,6 +744,14 @@ uint64_t MediumLevelILOperand::GetInteger() const
 	if (m_type != IntegerMediumLevelOperand)
 		throw MediumLevelILInstructionAccessException();
 	return m_instr.GetRawOperandAsInteger(m_operandIndex);
+}
+
+
+PossibleValueSet MediumLevelILOperand::GetPossibleValueSet() const
+{
+	if (m_type != PossibleValueSetMediumLevelOperand)
+		throw MediumLevelILInstructionAccessException();
+	return m_instr.GetRawOperandAsPossibleValueSet(m_operandIndex);
 }
 
 
@@ -1773,6 +1783,8 @@ ExprId MediumLevelILInstruction::CopyTo(MediumLevelILFunction* dest,
 		return dest->FloatConstRaw(size, GetConstant<MLIL_FLOAT_CONST>(), *this);
 	case MLIL_IMPORT:
 		return dest->ImportedAddress(size, GetConstant<MLIL_IMPORT>(), *this);
+	case MLIL_POSSIBLE_VALUE_SET:
+		return dest->PossibleValue(size, GetPossibleValueSet<MLIL_POSSIBLE_VALUE_SET>(), *this);
 	case MLIL_BP:
 		return dest->Breakpoint(*this);
 	case MLIL_TRAP:
@@ -1967,6 +1979,15 @@ int64_t MediumLevelILInstruction::GetConstant() const
 	size_t operandIndex;
 	if (GetOperandIndexForUsage(ConstantMediumLevelOperandUsage, operandIndex))
 		return GetRawOperandAsInteger(operandIndex);
+	throw MediumLevelILInstructionAccessException();
+}
+
+
+PossibleValueSet MediumLevelILInstruction::GetPossibleValueSet() const
+{
+	size_t operandIndex;
+	if (GetOperandIndexForUsage(PossibleValueSetMediumLevelOperandUsage, operandIndex))
+		return GetRawOperandAsPossibleValueSet(operandIndex);
 	throw MediumLevelILInstructionAccessException();
 }
 
@@ -2370,6 +2391,12 @@ ExprId MediumLevelILFunction::FloatConstDouble(double val, const ILSourceLocatio
 ExprId MediumLevelILFunction::ImportedAddress(size_t size, uint64_t val, const ILSourceLocation& loc)
 {
 	return AddExprWithLocation(MLIL_IMPORT, loc, size, val);
+}
+
+// TODO by reference
+ExprId MediumLevelILFunction::PossibleValue(size_t size, PossibleValueSet val, const ILSourceLocation& loc)
+{
+	return AddExprWithLocation(MLIL_POSSIBLE_VALUE_SET, loc, size, val);
 }
 
 

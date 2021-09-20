@@ -4313,6 +4313,7 @@ __attribute__ ((format (printf, 1, 2)))
 		ExprId FloatConstSingle(float val, const ILSourceLocation& loc = ILSourceLocation());
 		ExprId FloatConstDouble(double val, const ILSourceLocation& loc = ILSourceLocation());
 		ExprId ImportedAddress(size_t size, uint64_t val, const ILSourceLocation& loc = ILSourceLocation());
+		ExprId PossibleValue(size_t size, PossibleValueSet val, const ILSourceLocation& loc = ILSourceLocation());
 		ExprId Add(size_t size, ExprId left, ExprId right, const ILSourceLocation& loc = ILSourceLocation());
 		ExprId AddWithCarry(size_t size, ExprId left, ExprId right, ExprId carry,
 			const ILSourceLocation& loc = ILSourceLocation());
@@ -4473,6 +4474,7 @@ __attribute__ ((format (printf, 1, 2)))
 		ExprId AddIndexList(const std::vector<size_t>& operands);
 		ExprId AddVariableList(const std::vector<Variable>& vars);
 		ExprId AddSSAVariableList(const std::vector<SSAVariable>& vars);
+		ExprId AddPossibleValueSet(const PossibleValueSet& value);
 
 		BNMediumLevelILInstruction GetRawExpr(size_t i) const;
 		MediumLevelILInstruction operator[](size_t i);

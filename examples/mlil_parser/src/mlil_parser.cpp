@@ -179,6 +179,11 @@ static void PrintILExpr(const MediumLevelILInstruction& instr, size_t indent)
 			printf("int 0x%" PRIx64 "\n", operand.GetInteger());
 			break;
 
+		case PossibleValueSetMediumLevelOperand:
+			PrintIndent(indent);
+			printf("possibleValueSet %s\n", operand.GetPossibleValueSet().toString().c_str());
+			break;
+
 		case IndexMediumLevelOperand:
 			PrintIndent(indent);
 			printf("index %" PRIdPTR "\n", operand.GetIndex());

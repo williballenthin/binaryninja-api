@@ -69,6 +69,7 @@ namespace BinaryNinja
 	enum MediumLevelILOperandType
 	{
 		IntegerMediumLevelOperand,
+		PossibleValueSetMediumLevelOperand,
 		IndexMediumLevelOperand,
 		IntrinsicMediumLevelOperand,
 		ExprMediumLevelOperand,
@@ -101,6 +102,7 @@ namespace BinaryNinja
 		LowSSAVariableMediumLevelOperandUsage,
 		OffsetMediumLevelOperandUsage,
 		ConstantMediumLevelOperandUsage,
+		PossibleValueSetMediumLevelOperandUsage,
 		VectorMediumLevelOperandUsage,
 		IntrinsicMediumLevelOperandUsage,
 		TargetMediumLevelOperandUsage,
@@ -388,6 +390,7 @@ namespace BinaryNinja
 		MediumLevelILOperandList GetOperands() const;
 
 		uint64_t GetRawOperandAsInteger(size_t operand) const;
+		PossibleValueSet GetRawOperandAsPossibleValueSet(size_t operand) const;
 		size_t GetRawOperandAsIndex(size_t operand) const;
 		MediumLevelILInstruction GetRawOperandAsExpr(size_t operand) const;
 		Variable GetRawOperandAsVariable(size_t operand) const;
@@ -528,6 +531,7 @@ namespace BinaryNinja
 		template <BNMediumLevelILOperation N> SSAVariable GetLowSSAVariable() const { return As<N>().GetLowSSAVariable(); }
 		template <BNMediumLevelILOperation N> uint64_t GetOffset() const { return As<N>().GetOffset(); }
 		template <BNMediumLevelILOperation N> int64_t GetConstant() const { return As<N>().GetConstant(); }
+		template <BNMediumLevelILOperation N> PossibleValueSet GetPossibleValueSet() const { return As<N>().GetPossibleValueSet(); }
 		template <BNMediumLevelILOperation N> int64_t GetVector() const { return As<N>().GetVector(); }
 		template <BNMediumLevelILOperation N> uint32_t GetIntrinsic() const { return As<N>().GetIntrinsic(); }
 		template <BNMediumLevelILOperation N> size_t GetTarget() const { return As<N>().GetTarget(); }
@@ -579,6 +583,7 @@ namespace BinaryNinja
 		SSAVariable GetLowSSAVariable() const;
 		uint64_t GetOffset() const;
 		int64_t GetConstant() const;
+		PossibleValueSet GetPossibleValueSet() const;
 		int64_t GetVector() const;
 		uint32_t GetIntrinsic() const;
 		size_t GetTarget() const;
@@ -612,6 +617,7 @@ namespace BinaryNinja
 		MediumLevelILOperandUsage GetUsage() const { return m_usage; }
 
 		uint64_t GetInteger() const;
+		PossibleValueSet GetPossibleValueSet() const;
 		size_t GetIndex() const;
 		uint32_t GetIntrinsic() const;
 		MediumLevelILInstruction GetExpr() const;
@@ -659,6 +665,11 @@ namespace BinaryNinja
 	struct MediumLevelILConstantInstruction: public MediumLevelILInstructionBase
 	{
 		int64_t GetConstant() const { return GetRawOperandAsInteger(0); }
+	};
+
+	struct MediumLevelILPossibleValueSetInstruction: public MediumLevelILInstructionBase
+	{
+		PossibleValueSet GetPossibleValueSet() const { return GetRawOperandAsPossibleValueSet(0); }
 	};
 
 	struct MediumLevelILOneOperandInstruction: public MediumLevelILInstructionBase
@@ -1051,6 +1062,8 @@ namespace BinaryNinja
 	template <> struct MediumLevelILInstructionAccessor<MLIL_CONST_PTR>: public MediumLevelILConstantInstruction {};
 	template <> struct MediumLevelILInstructionAccessor<MLIL_FLOAT_CONST>: public MediumLevelILConstantInstruction {};
 	template <> struct MediumLevelILInstructionAccessor<MLIL_IMPORT>: public MediumLevelILConstantInstruction {};
+
+	template <> struct MediumLevelILInstructionAccessor<MLIL_POSSIBLE_VALUE_SET>: public MediumLevelILPossibleValueSetInstruction {};
 
 	template <> struct MediumLevelILInstructionAccessor<MLIL_ADD>: public MediumLevelILTwoOperandInstruction {};
 	template <> struct MediumLevelILInstructionAccessor<MLIL_SUB>: public MediumLevelILTwoOperandInstruction {};

@@ -230,6 +230,20 @@ ExprId MediumLevelILFunction::AddSSAVariableList(const vector<SSAVariable>& vars
 }
 
 
+ExprId AddPossibleValueSet(const PossibleValueSet& value)
+{
+	uint64_t* operandList = new uint64_t[vars.size() * 2];
+	for (size_t i = 0; i < vars.size(); i++)
+	{
+		operandList[i * 2] = vars[i].var.ToIdentifier();
+		operandList[(i * 2) + 1] = vars[i].version;
+	}
+	ExprId result = (ExprId)BNMediumLevelILAddOperandList(m_object, operandList, vars.size() * 2);
+	delete[] operandList;
+	return result;
+}
+
+
 BNMediumLevelILInstruction MediumLevelILFunction::GetRawExpr(size_t i) const
 {
 	return BNGetMediumLevelILByIndex(m_object, i);
