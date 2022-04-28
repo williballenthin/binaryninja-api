@@ -269,7 +269,7 @@ bool FileMetadata::Rebase(
 
 
 MergeResult FileMetadata::MergeUserAnalysis(
-    const std::string& name, const std::function<bool(size_t, size_t)>& progress, std::vector<string> excludedHashes)
+    const std::string& name, const std::function<bool(size_t, size_t)>& progress, const std::vector<string>& excludedHashes)
 {
 	size_t numHashes = excludedHashes.size();
 	char** tempList = new char*[numHashes];

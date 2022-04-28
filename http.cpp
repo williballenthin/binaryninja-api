@@ -229,8 +229,8 @@ namespace BinaryNinja::Http
 	}
 
 
-	Request::Request(string method, string url, unordered_map<string, string> headers,
-	    vector<pair<string, string>> params, std::function<bool(size_t, size_t)> downloadProgress,
+	Request::Request(const string& method, const string& url, const unordered_map<string, string>& headers,
+	    const vector<pair<string, string>>& params, std::function<bool(size_t, size_t)> downloadProgress,
 	    std::function<bool(size_t, size_t)> uploadProgress) :
 	    m_method(method),
 	    m_url(url), m_headers(headers), m_downloadProgress(downloadProgress), m_uploadProgress(uploadProgress)
@@ -252,8 +252,8 @@ namespace BinaryNinja::Http
 	}
 
 
-	Request::Request(string method, string url, unordered_map<string, string> headers,
-	    vector<pair<string, string>> params, vector<uint8_t> body, std::function<bool(size_t, size_t)> downloadProgress,
+	Request::Request(const string& method, const string& url, const unordered_map<string, string>& headers,
+	    const vector<pair<string, string>>& params, const vector<uint8_t>& body, std::function<bool(size_t, size_t)> downloadProgress,
 	    std::function<bool(size_t, size_t)> uploadProgress) :
 	    m_method(method),
 	    m_url(url), m_headers(headers), m_body(body), m_downloadProgress(downloadProgress),
@@ -276,8 +276,8 @@ namespace BinaryNinja::Http
 	}
 
 
-	Request::Request(string method, string url, unordered_map<string, string> headers,
-	    vector<pair<string, string>> params, vector<pair<string, string>> formFields,
+	Request::Request(const string& method, const string& url, const unordered_map<string, string>& headers,
+	    const vector<pair<string, string>>& params, const vector<pair<string, string>>& formFields,
 	    std::function<bool(size_t, size_t)> downloadProgress, std::function<bool(size_t, size_t)> uploadProgress) :
 	    m_method(method),
 	    m_url(url), m_headers(headers), m_downloadProgress(downloadProgress), m_uploadProgress(uploadProgress)
@@ -303,8 +303,8 @@ namespace BinaryNinja::Http
 	}
 
 
-	Request::Request(string method, string url, unordered_map<string, string> headers,
-	    vector<pair<string, string>> params, vector<MultipartField> formFields,
+	Request::Request(const string& method, const string& url, const unordered_map<string, string>& headers,
+	    const vector<pair<string, string>>& params, const vector<MultipartField>& formFields,
 	    std::function<bool(size_t, size_t)> downloadProgress, std::function<bool(size_t, size_t)> uploadProgress) :
 	    m_method(method),
 	    m_url(url), m_headers(headers), m_downloadProgress(downloadProgress), m_uploadProgress(uploadProgress)
@@ -331,31 +331,31 @@ namespace BinaryNinja::Http
 	}
 
 
-	Request Request::Get(string url, unordered_map<string, string> headers, vector<pair<string, string>> params,
+	Request Request::Get(const string& url, const unordered_map<string, string>& headers, const vector<pair<string, string>>& params,
 	    std::function<bool(size_t, size_t)> downloadProgress, std::function<bool(size_t, size_t)> uploadProgress)
 	{
 		return Request("GET", url, headers, params, downloadProgress, uploadProgress);
 	}
 
 
-	Request Request::Post(string url, unordered_map<string, string> headers, vector<pair<string, string>> params,
-	    vector<uint8_t> body, std::function<bool(size_t, size_t)> downloadProgress,
+	Request Request::Post(const string& url, const unordered_map<string, string>& headers, const vector<pair<string, string>>& params,
+	    const vector<uint8_t>& body, std::function<bool(size_t, size_t)> downloadProgress,
 	    std::function<bool(size_t, size_t)> uploadProgress)
 	{
 		return Request("POST", url, headers, params, body, downloadProgress, uploadProgress);
 	}
 
 
-	Request Request::Post(string url, unordered_map<string, string> headers, vector<pair<string, string>> params,
-	    vector<pair<string, string>> formFields, std::function<bool(size_t, size_t)> downloadProgress,
+	Request Request::Post(const string& url, const unordered_map<string, string>& headers, const vector<pair<string, string>>& params,
+	    const vector<pair<string, string>>& formFields, std::function<bool(size_t, size_t)> downloadProgress,
 	    std::function<bool(size_t, size_t)> uploadProgress)
 	{
 		return Request("POST", url, headers, params, formFields, downloadProgress, uploadProgress);
 	}
 
 
-	Request Request::Post(string url, unordered_map<string, string> headers, vector<pair<string, string>> params,
-	    vector<MultipartField> formFields, std::function<bool(size_t, size_t)> downloadProgress,
+	Request Request::Post(const string& url, const unordered_map<string, string>& headers, const vector<pair<string, string>>& params,
+	    const vector<MultipartField>& formFields, std::function<bool(size_t, size_t)> downloadProgress,
 	    std::function<bool(size_t, size_t)> uploadProgress)
 	{
 		return Request("POST", url, headers, params, formFields, downloadProgress, uploadProgress);

@@ -36,7 +36,7 @@ struct BINARYNINJAUIAPI LogListItem
 	std::string logger;
 	size_t threadId{0};
 
-	LogListItem(size_t sessionId, BNLogLevel level, std::string text, bool selected = false, const std::string& logger_name = "", size_t tid = 0);
+	LogListItem(size_t sessionId, BNLogLevel level, const std::string& text, bool selected = false, const std::string& logger_name = "", size_t tid = 0);
 };
 
 enum LoggingScope

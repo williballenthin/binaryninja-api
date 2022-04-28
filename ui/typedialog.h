@@ -88,7 +88,7 @@ class BINARYNINJAUIAPI TypeDialog : public QDialog
   private Q_SLOTS:
 	void accepted();
 	void checkParse();
-	void typeParsed(bool valid, BinaryNinja::QualifiedNameAndType type, QString error);
+	void typeParsed(bool valid, const BinaryNinja::QualifiedNameAndType& type, QString error);
 	void updateTimerEvent();
 
   public:

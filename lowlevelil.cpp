@@ -200,7 +200,7 @@ ExprId LowLevelILFunction::AddLabelMap(const map<uint64_t, BNLowLevelILLabel*>& 
 }
 
 
-ExprId LowLevelILFunction::AddOperandList(const vector<ExprId> operands)
+ExprId LowLevelILFunction::AddOperandList(const vector<ExprId>& operands)
 {
 	uint64_t* operandList = new uint64_t[operands.size()];
 	for (size_t i = 0; i < operands.size(); i++)
@@ -211,7 +211,7 @@ ExprId LowLevelILFunction::AddOperandList(const vector<ExprId> operands)
 }
 
 
-ExprId LowLevelILFunction::AddIndexList(const vector<size_t> operands)
+ExprId LowLevelILFunction::AddIndexList(const vector<size_t>& operands)
 {
 	uint64_t* operandList = new uint64_t[operands.size()];
 	for (size_t i = 0; i < operands.size(); i++)

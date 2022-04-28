@@ -53,7 +53,7 @@ class BINARYNINJAUIAPI SettingsTreeModel : public QAbstractItemModel
 	std::map<std::string, QString> m_filterText;
 
   public:
-	SettingsTreeModel(std::string schema, QObject* parent = 0);
+	SettingsTreeModel(const std::string& schema, QObject* parent = 0);
 	~SettingsTreeModel();
 
 	QVariant data(const QModelIndex& index, int role) const override;
@@ -380,7 +380,7 @@ class BINARYNINJAUIAPI SettingsView : public QWidget
 	SettingsView(QWidget* parent, SettingsRef settings);
 	~SettingsView();
 
-	void init(std::string schema, bool uiScopeSelection);
+	void init(const std::string& schema, bool uiScopeSelection);
 	void refreshCurrentScope();
 	void setData(BinaryViewRef view, const QString& name = "");
 	void setDefaultGroupSelection(const QString& group);

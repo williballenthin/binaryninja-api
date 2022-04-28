@@ -3673,7 +3673,7 @@ BNAnalysisParameters BinaryView::GetParametersForAnalysis()
 }
 
 
-void BinaryView::SetParametersForAnalysis(BNAnalysisParameters params)
+void BinaryView::SetParametersForAnalysis(const BNAnalysisParameters& params)
 {
 	BNSetParametersForAnalysis(m_object, params);
 }
@@ -3837,7 +3837,7 @@ BinaryData::BinaryData(FileMetadata* file, FileAccessor* accessor) :
 {}
 
 
-Ref<BinaryView> BinaryNinja::OpenView(const std::string& filename, bool updateAnalysis, std::function<bool(size_t, size_t)> progress, Json::Value options)
+Ref<BinaryView> BinaryNinja::OpenView(const std::string& filename, bool updateAnalysis, std::function<bool(size_t, size_t)> progress, const Json::Value& options)
 {
 	if (!progress)
 		progress = [](size_t, size_t) { return true; };
@@ -3880,7 +3880,7 @@ Ref<BinaryView> BinaryNinja::OpenView(const std::string& filename, bool updateAn
 }
 
 
-Ref<BinaryView> BinaryNinja::OpenView(const DataBuffer& rawData, bool updateAnalysis, std::function<bool(size_t, size_t)> progress, Json::Value options)
+Ref<BinaryView> BinaryNinja::OpenView(const DataBuffer& rawData, bool updateAnalysis, std::function<bool(size_t, size_t)> progress, const Json::Value& options)
 {
 	Ref<FileMetadata> file = new FileMetadata();
 	Ref<BinaryView> view = new BinaryData(file, rawData);

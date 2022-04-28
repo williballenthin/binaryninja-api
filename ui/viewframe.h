@@ -252,7 +252,7 @@ class BINARYNINJAUIAPI ViewNavigationMode
 	ViewNavigationMode();
 
   public:
-	ViewNavigationMode(View* view, std::string mode) : m_view(view)
+	ViewNavigationMode(View* view, const std::string& mode) : m_view(view)
 	{
 		m_mode = m_view->getNavigationMode();
 		m_view->setNavigationMode(mode);

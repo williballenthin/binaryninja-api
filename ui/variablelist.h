@@ -35,10 +35,10 @@ class VariableListItem
   public:
 	//! Create a new VariableListItem of the LocalVariable type.
 	VariableListItem(
-	    FunctionRef func, BinaryNinja::Variable var, BinaryNinja::PossibleValueSet pvs, bool hasUidf, std::string name);
+	    FunctionRef func, BinaryNinja::Variable var, const BinaryNinja::PossibleValueSet& pvs, bool hasUidf, const std::string& name);
 
 	//! Create a new VariableListItem of the DataVariable type.
-	VariableListItem(FunctionRef func, BinaryNinja::DataVariable dataVar, uint64_t refPoint, std::string name);
+	VariableListItem(FunctionRef func, const BinaryNinja::DataVariable& dataVar, uint64_t refPoint, const std::string& name);
 
 	//! Get the type of this list item.
 	VariableListItemType type() const;

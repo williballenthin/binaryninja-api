@@ -665,7 +665,7 @@ namespace BinaryNinja {
 	                   the desired settings.
 	    \return Constructed view, or a nullptr Ref<BinaryView>
 	 */
-	Ref<BinaryView> OpenView(const std::string& filename, bool updateAnalysis = true, std::function<bool(size_t, size_t)> progress = {}, Json::Value options = Json::Value(Json::objectValue));
+	Ref<BinaryView> OpenView(const std::string& filename, bool updateAnalysis = true, std::function<bool(size_t, size_t)> progress = {}, const Json::Value& options = Json::Value(Json::objectValue));
 
 	/*!
 	    Open a BinaryView from a raw data buffer, initializing data views and loading settings.
@@ -682,7 +682,7 @@ namespace BinaryNinja {
 	                   the desired settings.
 	    \return Constructed view, or a nullptr Ref<BinaryView>
 	 */
-	Ref<BinaryView> OpenView(const DataBuffer& rawData, bool updateAnalysis = true, std::function<bool(size_t, size_t)> progress = {}, Json::Value options = Json::Value(Json::objectValue));
+	Ref<BinaryView> OpenView(const DataBuffer& rawData, bool updateAnalysis = true, std::function<bool(size_t, size_t)> progress = {}, const Json::Value& options = Json::Value(Json::objectValue));
 
 
 	/*!
@@ -1063,7 +1063,7 @@ namespace BinaryNinja {
 		    const std::function<bool(size_t progress, size_t total)>& progressCallback);
 
 		MergeResult MergeUserAnalysis(const std::string& name, const std::function<bool(size_t, size_t)>& progress,
-		    const std::vector<std::string> excludedHashes = {});
+		    const std::vector<std::string>& excludedHashes = {});
 
 		void BeginUndoActions();
 		void CommitUndoActions();
@@ -2203,7 +2203,7 @@ namespace BinaryNinja {
 		void SetLoadSettings(const std::string& typeName, Ref<Settings> settings);
 
 		BNAnalysisParameters GetParametersForAnalysis();
-		void SetParametersForAnalysis(BNAnalysisParameters params);
+		void SetParametersForAnalysis(const BNAnalysisParameters& params);
 		uint64_t GetMaxFunctionSizeForAnalysis();
 		void SetMaxFunctionSizeForAnalysis(uint64_t size);
 		bool GetNewAutoFunctionAnalysisSuppressed();
@@ -4410,8 +4410,8 @@ namespace BinaryNinja {
 
 		std::vector<uint64_t> GetOperandList(ExprId i, size_t listOperand);
 		ExprId AddLabelMap(const std::map<uint64_t, BNLowLevelILLabel*>& labels);
-		ExprId AddOperandList(const std::vector<ExprId> operands);
-		ExprId AddIndexList(const std::vector<size_t> operands);
+		ExprId AddOperandList(const std::vector<ExprId>& operands);
+		ExprId AddIndexList(const std::vector<size_t>& operands);
 		ExprId AddRegisterOrFlagList(const std::vector<RegisterOrFlag>& regs);
 		ExprId AddSSARegisterList(const std::vector<SSARegister>& regs);
 		ExprId AddSSARegisterStackList(const std::vector<SSARegisterStack>& regStacks);
@@ -4745,7 +4745,7 @@ namespace BinaryNinja {
 
 		std::vector<uint64_t> GetOperandList(ExprId i, size_t listOperand);
 		ExprId AddLabelMap(const std::map<uint64_t, BNMediumLevelILLabel*>& labels);
-		ExprId AddOperandList(const std::vector<ExprId> operands);
+		ExprId AddOperandList(const std::vector<ExprId>& operands);
 		ExprId AddIndexList(const std::vector<size_t>& operands);
 		ExprId AddVariableList(const std::vector<Variable>& vars);
 		ExprId AddSSAVariableList(const std::vector<SSAVariable>& vars);
@@ -6486,8 +6486,8 @@ namespace BinaryNinja {
 		Ref<CallingConvention> callingConvention;
 		Ref<Platform> platform;
 
-		DebugFunctionInfo(std::string shortName, std::string fullName, std::string rawName, uint64_t address,
-		    Ref<Type> returnType, std::vector<std::tuple<std::string, Ref<Type>>> parameters, bool variableParameters,
+		DebugFunctionInfo(const std::string& shortName, const std::string& fullName, const std::string& rawName, uint64_t address,
+		    Ref<Type> returnType, const std::vector<std::tuple<std::string, Ref<Type>>>& parameters, bool variableParameters,
 		    Ref<CallingConvention> callingConvention, Ref<Platform> platform) :
 		    shortName(shortName),
 		    fullName(fullName), rawName(rawName), address(address), returnType(returnType), parameters(parameters),
