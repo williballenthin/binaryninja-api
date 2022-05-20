@@ -184,7 +184,8 @@ std::function<QVariant(QVariant)> convertToQVariantFunction(Func&& func);
 
     Example:
 
-        BackgroundThread::create()
+        // Passing `this` into create() will make the thread stop if `this` is deleted before it finishes.
+        BackgroundThread::create(this)
         // Do actions serially in the background
         ->thenBackground([this](QVariant) {
             bool success = SomeLongNetworkOperation();
@@ -200,7 +201,9 @@ std::function<QVariant(QVariant)> convertToQVariantFunction(Func&& func);
         })
         // You can also combine with a ProgressTask for showing a progress dialog
         ->thenBackgroundWithProgress(m_window, "Doing Task", "Please wait...", "Cancel", [this](QVariant var,
-   ProgressTask* task, ProgressFunction progress) { progress(0, 0); DoTask1WithProgress(SplitProgress(progress, 0, 1));
+   ProgressTask* task, ProgressFunction progress) {
+            progress(0, 0);
+            DoTask1WithProgress(SplitProgress(progress, 0, 1));
             // You can interface with the task itself
             task->setText("Doing Part 2");
             DoTask2WithProgress(SplitProgress(progress, 1, 1));
@@ -261,6 +264,8 @@ class BINARYNINJAUIAPI BackgroundThread : public QObject
 		Background
 	};
 
+	QPointer<QObject> m_owner;
+	bool m_hasOwner;
 	QVariant m_init;
 	QFuture<void> m_future;
 	bool m_finished;
@@ -270,7 +275,7 @@ class BINARYNINJAUIAPI BackgroundThread : public QObject
 	std::vector<std::pair<FunctionType, CatchFunction>> m_catch;
 	std::vector<std::pair<FunctionType, FinallyFunction>> m_finally;
 
-	BackgroundThread() : QObject(), m_finished(false), m_exception() {}
+	BackgroundThread(QObject* owner) : QObject(), m_owner(owner), m_hasOwner(owner != nullptr), m_finished(false), m_exception() {}
 
 	void runThread()
 	{
@@ -279,6 +284,8 @@ class BINARYNINJAUIAPI BackgroundThread : public QObject
 		{
 			for (auto& func : m_then)
 			{
+				if (m_hasOwner && !m_owner)
+					return;
 				switch (func.first)
 				{
 				case MainThread:
@@ -291,6 +298,8 @@ class BINARYNINJAUIAPI BackgroundThread : public QObject
 			}
 			for (auto& func : m_finally)
 			{
+				if (m_hasOwner && !m_owner)
+					return;
 				try
 				{
 					switch (func.first)
@@ -321,6 +330,8 @@ class BINARYNINJAUIAPI BackgroundThread : public QObject
 			std::exception_ptr exc = std::current_exception();
 			for (auto& func : m_catch)
 			{
+				if (m_hasOwner && !m_owner)
+					return;
 				try
 				{
 					switch (func.first)
@@ -340,6 +351,8 @@ class BINARYNINJAUIAPI BackgroundThread : public QObject
 			}
 			for (auto& func : m_finally)
 			{
+				if (m_hasOwner && !m_owner)
+					return;
 				try
 				{
 					switch (func.first)
@@ -370,11 +383,13 @@ class BINARYNINJAUIAPI BackgroundThread : public QObject
   public:
 	/*!
 	    Create a new background thread (but don't start it)
+	    \param owner QObject that "owns" the thread (or nullptr). If this owner is destroyed, the thread will
+	                 be terminated before the next callback.
 	    \return Empty thread with no functions
 	 */
-	static BackgroundThread* create()
+	static BackgroundThread* create(QObject* owner = nullptr)
 	{
-		BackgroundThread* thread = new BackgroundThread();
+		BackgroundThread* thread = new BackgroundThread(owner);
 		return thread;
 	}
 
