@@ -1,6 +1,6 @@
 site_name: 'Binary Ninja User Documentation'
 site_url: 'https://docs.binary.ninja/'
-repo_url: 'https://binary.ninja/'
+repo_url: 'https://github.com/vector35/binaryninja-api'
 repo_name: 'github'
 site_description: 'Documentation for the Binary Ninja reverse engineering platform'
 site_author: 'Vector 35 Inc'
@@ -9,16 +9,20 @@ use_directory_urls: False
 extra_css: ['docs.css', 'github.min.css', 'juxtapose.css']
 extra_javascript: ['highlight.min.js', 'cpp.min.js', 'python.min.js', 'juxtapose.js']
 theme:
-    name: readthedocs
+    name: material
     favicon: 'img/favicon.ico'
-    highlightjs: false
+    highlightjs: true
     shortcuts:
         help: 191    # ?
         next: 78     # n
         previous: 80 # p
         search: 191   # ? / /
+    navigation_depth: 3
+    palette:
+      accent: deep orange
+      primay: red
 
-        copyright: '(<a href="https://creativecommons.org/licenses/by/3.0/">cc</a>) <a href="https://vector35.com/">Vector 35 Inc</a>'
+    copyright: '(<a href="https://creativecommons.org/licenses/by/3.0/">cc</a>) <a href="https://vector35.com/">Vector 35 Inc</a>'
 
 plugins:
     - search

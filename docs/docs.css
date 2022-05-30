@@ -8,37 +8,22 @@ background: rgba(0, 0, 0, 0);
 }
  */
 
-code,
-.codehilite {
-    background-color: #eee;
-}
-
 .admonition.warning .admonition-title,
 .admonition.warning {
     background-color: #d73726 !important;
-    color: #fff !important;
+    color: #fff;
+}
+
+.admonition.note .admonition-title,
+.admonition.note {
+    background-color: #d73726 !important;
+    color: #fff;
 }
 
 .admonition.tip .admonition-title,
 .admonition.tip {
-    background: #6e6e6e !important;
-    color: #fff !important;
-}
-
-a,
-.rst-content div a code,
-a code {
-    color: #d73726;
-}
-
-a:visited,
-a:visited code {
-    color: #990000;
-}
-
-a:hover,
-a:hover code {
-    color: #ff8080;
+    background-color: #d73726 !important;
+    color: #fff;
 }
 
 img[alt$=">"] {
@@ -83,78 +68,11 @@ pre {
     overflow-x: auto;
 }
 
-.wy-side-nav-search {
-    background-color: #d73726;
-    color: #fff;
+:root > * {
+  --md-primary-fg-color:        #d73726;
 }
 
-.wy-menu-vertical p.caption {
-    color: #9b9b9b;
-}
-
-.toctree-l1 a:visited,
-.toctree-l1 a:hover,
-.toctree-l1 a {
-    color: #ccc;
-}
-
-.wy-nav-top {
-    background-color: #d73726 !important;
-    color: #fff !important;
-}
-
-.wy-nav-top a:visited,
-.wy-nav-top a:hover,
-.wy-nav-top a,
-.wy-side-nav-search a:visited,
-.wy-side-nav-search a:hover,
-.wy-side-nav-search a {
-    color: #fff;
-}
-
-#image-slider {
-    background-color: #000;
-}
-
-.lslide {
-    margin: 0px !important;
-    text-align: center;
-}
-
-.hiddenc {
-    height: 1px;
-    opacity: 0;
-    filter: alpha(opacity=0);
-    overflow: hidden;
-}
-
-ol#inline-slides-text li#currentline {
-    background-color: #6e6e6e;
-    color: #fff;
-    font-weight: bold;
-}
-
-ol#inline-slides-text li {
-    list-style-position: inside;
-}
-
-@media screen and (max-width: 1020px) {
-    div[class^="inline-slides"] {
-        flex-wrap: wrap;
-    }
-}
-
-div[class^="inline-slides"] {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-div[class^="inline-slides"]>div[id^="image-slider-container"] {
-    margin-left: 10px;
-    flex-shrink: 1;
-}
-
+/* Customize Settings Table Width */ 
 h3#all-settings + p + div table tbody tr > td:nth-child(2) {
     max-width: 300px;
     overflow: auto;
