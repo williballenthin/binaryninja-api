@@ -8,6 +8,7 @@ google_analytics: ['UA-72420552-3', 'docs.binary.ninja' ]
 use_directory_urls: False
 extra_css: ['docs.css', 'github.min.css', 'juxtapose.css']
 extra_javascript: ['highlight.min.js', 'cpp.min.js', 'python.min.js', 'juxtapose.js']
+edit_uri: edit/dev/docs/
 theme:
     name: material
     favicon: 'img/favicon.ico'
@@ -21,10 +22,18 @@ theme:
     palette:
       accent: deep orange
       primay: red
-
-    copyright: '(<a href="https://creativecommons.org/licenses/by/3.0/">cc</a>) <a href="https://vector35.com/">Vector 35 Inc</a>'
+    logo: 'img/logo.png'
+    features:
+      - navigation.sections
+      - navigation.prune
+      - toc.follow
+      - search.share
+copyright: '(<a href="https://creativecommons.org/licenses/by/3.0/">cc</a>) <u><a href="https://vector35.com/">Vector 35 Inc</a></u>, made with <u><a href="https://www.mkdocs.org/">MkDocs</a></u> and the <u><a href="https://squidfunk.github.io/mkdocs-material/">Material</a></u> theme'
 
 plugins:
+    #- privacy:
+    #   externals: bundle
+    #- offline
     - search
 
 markdown_extensions:
@@ -57,4 +66,5 @@ nav:
 
 extra:
     disablesearch: True
-    logo: 'images/logo.png'
+    homepage: https://binary.ninja/
+    generator: false

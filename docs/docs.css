@@ -8,24 +8,6 @@ background: rgba(0, 0, 0, 0);
 }
  */
 
-.admonition.warning .admonition-title,
-.admonition.warning {
-    background-color: #d73726 !important;
-    color: #fff;
-}
-
-.admonition.note .admonition-title,
-.admonition.note {
-    background-color: #d73726 !important;
-    color: #fff;
-}
-
-.admonition.tip .admonition-title,
-.admonition.tip {
-    background-color: #d73726 !important;
-    color: #fff;
-}
-
 img[alt$=">"] {
     float: right;
     display: inline-block;
