@@ -1064,6 +1064,9 @@ namespace BinaryNinja {
 		bool CreateSnapshotedView(BinaryView* data, const std::string& viewName);
 		bool CreateSnapshotedView(BinaryView* data, const std::string& viewName,
 								  const std::function<bool(size_t progress, size_t total)>& progressCallback);
+		bool AttachBinaryView(BinaryView* data, const std::string& viewName);
+		bool AttachBinaryView(BinaryView* data, const std::string& viewName,
+			const std::function<bool(size_t progress, size_t total)>& progressCallback);
 
 		MergeResult MergeUserAnalysis(const std::string& name, const std::function<bool(size_t, size_t)>& progress,
 		    const std::vector<std::string> excludedHashes = {});
