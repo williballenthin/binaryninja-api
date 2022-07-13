@@ -285,7 +285,7 @@ bool FileMetadata::CreateSnapshotedView(BinaryView* data, const std::string& vie
 
 bool FileMetadata::AttachBinaryView(BinaryView *data, const std::string &viewName)
 {
-	return BNAttachBinaryView(data->GetObject(), viewName.c_str());
+	return BNAttachBinaryView(m_object, data->GetObject(), viewName.c_str());
 }
 
 
@@ -294,7 +294,7 @@ bool FileMetadata::AttachBinaryView(BinaryView* data, const std::string& viewNam
 {
 	DatabaseProgressCallbackContext cb;
 	cb.func = progressCallback;
-	return BNAttachBinaryViewWithProgress(data->GetObject(), viewName.c_str(), &cb, DatabaseProgressCallback);
+	return BNAttachBinaryViewWithProgress(m_object, data->GetObject(), viewName.c_str(), &cb, DatabaseProgressCallback);
 }
 
 

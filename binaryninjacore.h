@@ -3137,9 +3137,10 @@ extern "C"
 	BINARYNINJACOREAPI bool BNCreateSnapshotedView(BNBinaryView* data, const char* viewName);
 	BINARYNINJACOREAPI bool BNCreateSnapshotedViewWithProgress(BNBinaryView* data, const char* viewName, void* ctxt,
 															   bool (*progress)(void* ctxt, size_t progress, size_t total));
-	BINARYNINJACOREAPI bool BNAttachBinaryView(BNBinaryView* data, const char* viewName);
-	BINARYNINJACOREAPI bool BNAttachBinaryViewWithProgress(BNBinaryView* data, const char* viewName, void* ctxt,
-		bool (*progress)(void* ctxt, size_t progress, size_t total));
+	BINARYNINJACOREAPI bool BNAttachBinaryView(BNFileMetadata* file, BNBinaryView* data, const char* viewName);
+	BINARYNINJACOREAPI bool BNAttachBinaryViewWithProgress(BNFileMetadata* file, BNBinaryView* data,
+															const char* viewName, void* ctxt,
+															bool (*progress)(void* ctxt, size_t progress, size_t total));
 
 	BINARYNINJACOREAPI BNMergeResult BNMergeUserAnalysis(BNFileMetadata* file, const char* name, void* ctxt,
 	    bool (*progress)(void* ctxt, size_t progress, size_t total), char** excludedHashes, size_t excludedHashesCount);
