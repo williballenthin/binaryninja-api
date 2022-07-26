@@ -1749,6 +1749,7 @@ class VerifyBuilder(Builder):
             ok = True
             for i in initial_object_counts.keys():
                 if final_object_counts[i] > initial_object_counts[i]:
+                    print(f'Leak: {i} has {final_object_counts[i]-initial_object_counts[i]} more final allocation(s) than initial', file=sys.stderr)
                     ok = False
             return ok
         finally:
