@@ -297,6 +297,8 @@ void BinaryDataNotification::SectionRemovedCallback(void* ctxt, BNBinaryView* da
 	Ref<Section> sectionObj = new Section(BNNewSectionReference(section));
 
 	notify->OnSectionRemoved(view, sectionObj);
+}
+
 void BinaryDataNotification::ComponentUpdatedCallback(void* ctxt, BNBinaryView* data, BNComponent* bnComponent)
 {
 	BinaryDataNotification* notify = (BinaryDataNotification*)ctxt;

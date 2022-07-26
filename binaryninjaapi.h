@@ -1314,6 +1314,7 @@ namespace BinaryNinja {
 		{
 			(void)data;
 			(void)section;
+		}
 		virtual void OnComponentUpdated(BinaryView* data, Component* component)
 		{
 			(void)data;
