@@ -297,6 +297,30 @@ void BinaryDataNotification::SectionRemovedCallback(void* ctxt, BNBinaryView* da
 	Ref<Section> sectionObj = new Section(BNNewSectionReference(section));
 
 	notify->OnSectionRemoved(view, sectionObj);
+void BinaryDataNotification::ComponentUpdatedCallback(void* ctxt, BNBinaryView* data, BNComponent* bnComponent)
+{
+	BinaryDataNotification* notify = (BinaryDataNotification*)ctxt;
+	Ref<BinaryView> view = new BinaryView(BNNewViewReference(data));
+	Ref<Component> component = new Component(view, BNNewComponentReference(bnComponent));
+	notify->OnComponentUpdated(view, component);
+}
+
+
+void BinaryDataNotification::ComponentAddedCallback(void* ctxt, BNBinaryView* data, BNComponent* bnComponent)
+{
+	BinaryDataNotification* notify = (BinaryDataNotification*)ctxt;
+	Ref<BinaryView> view = new BinaryView(BNNewViewReference(data));
+	Ref<Component> component = new Component(view, BNNewComponentReference(bnComponent));
+	notify->OnComponentAdded(view, component);
+}
+
+
+void BinaryDataNotification::ComponentRemovedCallback(void* ctxt, BNBinaryView* data, BNComponent* bnComponent)
+{
+	BinaryDataNotification* notify = (BinaryDataNotification*)ctxt;
+	Ref<BinaryView> view = new BinaryView(BNNewViewReference(data));
+	Ref<Component> component = new Component(view, BNNewComponentReference(bnComponent));
+	notify->OnComponentRemoved(view, component);
 }
 
 
@@ -333,6 +357,9 @@ BinaryDataNotification::BinaryDataNotification()
 	m_callbacks.sectionAdded = SectionAddedCallback;
 	m_callbacks.sectionUpdated = SectionUpdatedCallback;
 	m_callbacks.sectionRemoved = SectionRemovedCallback;
+	m_callbacks.componentUpdated = ComponentUpdatedCallback;
+	m_callbacks.componentAdded = ComponentAddedCallback;
+	m_callbacks.componentRemoved = ComponentRemovedCallback;
 }
 
 
@@ -2872,6 +2899,76 @@ Ref<Tag> BinaryView::CreateUserDataTag(uint64_t addr, Ref<TagType> tagType, cons
 	AddUserDataTag(addr, tag);
 	return tag;
 }
+
+
+std::optional<Ref<Component>> BinaryView::GetComponentByGuid(std::string guid)
+{
+	BNComponent* bncomponent = BNGetComponentByGuid(m_object, guid.c_str());
+
+	if (bncomponent)
+	{
+		auto component = new Component(this, bncomponent);
+		return std::optional<Ref<Component>>{component};
+	}
+
+	return std::nullopt;
+}
+
+Ref<Component> BinaryView::GetRootComponent()
+{
+	BNComponent* bncomponent = BNGetRootComponent(m_object);
+
+	return new Component(this, bncomponent);
+}
+
+
+Ref<Component> BinaryView::CreateComponent(std::string parentGUID)
+{
+	BNComponent* bnComponent;
+	if (!parentGUID.empty())
+		bnComponent = BNCreateComponentWithParent(m_object, parentGUID.c_str());
+	else
+		bnComponent = BNCreateComponent(m_object);
+
+	return new Component(this, bnComponent);
+}
+
+
+Ref<Component> BinaryView::CreateComponentNamed(std::string name, std::string parentGUID)
+{
+	BNComponent* bnComponent;
+	if (!parentGUID.empty())
+		bnComponent = BNCreateComponentWithParentAndName(m_object, parentGUID.c_str(), name.c_str());
+	else
+		bnComponent = BNCreateComponentWithName(m_object, name.c_str());
+
+	return new Component(this, bnComponent);
+}
+
+
+bool BinaryView::MoveComponentToComponent(Ref<Component> child, Ref<Component> newParent)
+{
+	return BNMoveComponentToParent(m_object, child->m_object, newParent->m_object);
+}
+
+
+bool BinaryView::MoveComponentToRoot(Ref<Component> child)
+{
+	return BNMoveComponentToRoot(m_object, child->m_object);
+}
+
+
+bool BinaryView::RemoveComponent(Ref<Component> component)
+{
+	return BNRemoveComponent(m_object, component->m_object);
+}
+
+
+bool BinaryView::RemoveComponent(std::string guid)
+{
+	return BNRemoveComponentByGuid(m_object, guid.c_str());
+}
+
 
 bool BinaryView::CanAssemble(Architecture* arch)
 {

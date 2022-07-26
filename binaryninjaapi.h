@@ -1104,6 +1104,7 @@ namespace BinaryNinja {
 	struct TagReference;
 	class Section;
 	class Segment;
+	class Component;
 
 	class BinaryDataNotification
 	{
@@ -1143,6 +1144,9 @@ namespace BinaryNinja {
 		static void SectionUpdatedCallback(void* ctx, BNBinaryView* data, BNSection* section);
 		static void SectionRemovedCallback(void* ctx, BNBinaryView* data, BNSection* section);
 
+		static void ComponentUpdatedCallback(void* ctxt, BNBinaryView* data, BNComponent* component);
+		static void ComponentAddedCallback(void* ctxt, BNBinaryView* data, BNComponent* component);
+		static void ComponentRemovedCallback(void* ctxt, BNBinaryView* data, BNComponent* component);
 
 	  public:
 		BinaryDataNotification();
@@ -1310,6 +1314,20 @@ namespace BinaryNinja {
 		{
 			(void)data;
 			(void)section;
+		virtual void OnComponentUpdated(BinaryView* data, Component* component)
+		{
+			(void)data;
+			(void)component;
+		}
+		virtual void OnComponentAdded(BinaryView* data, Component* component)
+		{
+			(void)data;
+			(void)component;
+		}
+		virtual void OnComponentRemoved(BinaryView* data, Component* component)
+		{
+			(void)data;
+			(void)component;
 		}
 	};
 
@@ -1783,6 +1801,7 @@ namespace BinaryNinja {
 	class Structure;
 	class NamedTypeReference;
 	struct TypeParserResult;
+	class Component;
 
 	class QueryMetadataException : public std::exception
 	{
@@ -2120,6 +2139,15 @@ namespace BinaryNinja {
 
 		Ref<Tag> CreateAutoDataTag(uint64_t addr, Ref<TagType> tagType, const std::string& data, bool unique = false);
 		Ref<Tag> CreateUserDataTag(uint64_t addr, Ref<TagType> tagType, const std::string& data, bool unique = false);
+
+		std::optional<Ref<Component>> GetComponentByGuid(std::string guid);
+		Ref<Component> GetRootComponent();
+		Ref<Component> CreateComponent(std::string parentGUID = {});
+		Ref<Component> CreateComponentNamed(std::string name, std::string parentGUID = {});
+		bool MoveComponentToComponent(Ref<Component> child, Ref<Component> newParent);
+		bool MoveComponentToRoot(Ref<Component> child);
+		bool RemoveComponent(Ref<Component> component);
+		bool RemoveComponent(std::string guid);
 
 		bool CanAssemble(Architecture* arch);
 
@@ -7094,4 +7122,30 @@ namespace BinaryNinja {
 		virtual bool StoreData(const std::string& key, const std::string& data) override;
 		virtual bool DeleteData(const std::string& key) override;
 	};
+
+	class Component : public CoreRefCountObject<BNComponent, BNNewComponentReference, BNFreeComponent>
+	{
+		Ref<BinaryView> m_view;
+	public:
+		Component(Ref<BinaryView> view, BNComponent* type);
+		std::string GetGuid();
+
+		bool operator==(const Component& other) const;
+		bool operator!=(const Component& other) const;
+
+		std::string GetName();
+		void SetName(const std::string &name);
+		Ref<Component> GetParent();
+
+		bool AddFunction(Ref<Function> func);
+		bool AddComponent(Ref<Component> component);
+		bool RemoveFunction(Ref<Function> func);
+		bool RemoveComponent(Ref<Component> component);
+
+		std::vector<Ref<Type>> GetReferencedTypes();
+		std::vector<Ref<Component>> GetContainedComponents();
+		std::vector<Ref<Function>> GetContainedFunctions();
+		std::vector<DataVariable> GetReferencedDataVariables();
+	};
+
 }  // namespace BinaryNinja

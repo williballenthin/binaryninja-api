@@ -48,6 +48,7 @@ from . import typelibrary
 from . import fileaccessor
 from . import databuffer
 from . import basicblock
+from . import component
 from . import lineardisassembly
 from . import metadata
 from . import highlight
@@ -227,6 +228,15 @@ class BinaryDataNotification:
 
 	def section_removed(self, view: 'BinaryView', section: 'Section') -> None:
 		pass
+	def component_added(self, _component: component.Component) -> None:
+		pass
+
+	def component_removed(self, _component: component.Component) -> None:
+		pass
+
+	def component_updated(self, _component: component.Component) -> None:
+		pass
+
 
 class StringReference:
 	_decodings = {
@@ -463,6 +473,9 @@ class BinaryDataNotificationCallbacks:
 		self._cb.sectionUpdated = self._cb.sectionUpdated.__class__(self._section_updated)
 		self._cb.sectionRemoved = self._cb.sectionRemoved.__class__(self._section_removed)
 
+		self._cb.componentUpdated = self._cb.componentUpdated.__class__(self._component_updated)
+		self._cb.componentAdded = self._cb.componentAdded.__class__(self._component_added)
+		self._cb.componentRemoved = self._cb.componentRemoved.__class__(self._component_removed)
 
 	def _register(self) -> None:
 		core.BNRegisterDataNotification(self._view.handle, self._cb)
@@ -733,6 +746,23 @@ class BinaryDataNotificationCallbacks:
 			assert section_handle is not None, "core.BNNewSectionReference returned None"
 			result = Section(section_handle)
 			self._notify.section_removed(self._view, result)
+		except:
+			log_error(traceback.format_exc())
+	def _component_added(self, ctxt, _component: core.BNComponent):
+		try:
+			self._notify.component_added(_component)
+		except:
+			log_error(traceback.format_exc())
+
+	def _component_removed(self, ctxt, _component: core.BNComponent):
+		try:
+			self._notify.component_removed(_component)
+		except:
+			log_error(traceback.format_exc())
+
+	def _component_updated(self, ctxt, _component: core.BNComponent):
+		try:
+			self._notify.component_updated(_component)
 		except:
 			log_error(traceback.format_exc())
 
@@ -5805,6 +5835,42 @@ class BinaryView:
 
 	def notify_data_removed(self, offset: int, length: int) -> None:
 		core.BNNotifyDataRemoved(self.handle, offset, length)
+
+	def get_component(self, guid: str):
+		bn_component = core.BNGetComponentByGuid(self.handle, guid)
+		if bn_component is None:
+			return None
+		return component.Component(self, bn_component)
+
+	@property
+	def root_component(self) -> component.Component:
+		return component.Component(self, core.BNGetRootComponent(self.handle))
+
+	def create_component(self, parent_guid: Optional[str] = None) -> component.Component:
+		if parent_guid:
+			return component.Component(self, core.BNCreateComponentWithParent(self.handle, parent_guid))
+		else:
+			return component.Component(self, core.BNCreateComponent(self.handle))
+
+	def create_component_with_name(self, name: str, parent_guid: Optional[str] = None):
+		if parent_guid:
+			return component.Component(self, core.BNCreateComponentWithParentAndName(self.handle, parent_guid, name))
+		else:
+			return component.Component(self, core.BNCreateComponentWithName(self.handle, name))
+
+	def move_component_to_component(self, child: component.Component, new_parent: component.Component) -> bool:
+		return core.BNMoveComponentToParent(self.handle, child.handle, new_parent.handle)
+
+	def move_component_to_root(self, child: component.Component):
+		return core.BNMoveComponentToRoot(self.handle, child.handle)
+
+	def remove_component(self, _component: component.Component):
+		success = core.BNRemoveComponent(self.handle, _component.handle)
+		return success
+
+	def remove_component_by_guid(self, guid: str):
+		success = core.BNRemoveComponentByGuid(self.handle, guid)
+		return success
 
 	def get_strings(self, start: Optional[int] = None, length: Optional[int] = None) -> List['StringReference']:
 		"""

@@ -29,6 +29,7 @@ from binaryninja.highlevelil import *
 from binaryninja.variable import *
 from binaryninja.typeparser import *
 from binaryninja.typeprinter import *
+from binaryninja.component import Component
 import zipfile
 
 
@@ -3002,6 +3003,141 @@ class TestBinaryViewType(unittest.TestCase):
 			with BinaryViewType.get_view_of_file(filename) as bv:
 				assert bvt2.is_valid_for_data(bv.parent_view)
 				assert isinstance(bvt2.parse(bv.parent_view), BinaryView)
+
+
+class TestComponents(TestWithBinaryView):
+	def setUp(self):
+		super().setUp()
+
+	def assertLenEqual(self, a: Iterable, size, message=""):
+		assert len(a) == size, message
+
+	def assertLenGreater(self, a: Iterable, minimum_size, message=""):
+		assert len(a) > minimum_size, message
+
+	def test_parent_enforcement(self):
+		root_1 = self.bv.create_component()
+		root_1.name = "root_1"
+		root_2 = self.bv.create_component()
+		root_2.name = "root_2"
+		root_3 = self.bv.create_component()
+		root_3.name = "root_3"
+
+		level_1 = self.bv.create_component()
+		level_1.name = "level_1"
+		level_2 = self.bv.create_component()
+		level_2.name = "level_2"
+		level_3 = self.bv.create_component()
+		level_3.name = "level_3"
+
+		"""
+		Setup 1: 
+		root_1
+		  level_1
+		    level_2
+		      level_3
+		root_2
+		root_3
+		"""
+
+		assert self.bv.move_component_to_component(level_1, root_1)
+		assert self.bv.move_component_to_component(level_2, level_1)
+		assert self.bv.move_component_to_component(level_3, level_2)
+		"""
+		These should all work:
+		Move level_2 -> binaryview
+		Move level_3 -> level_1
+		Move level_1 -> level_2
+		"""
+
+		assert self.bv.move_component_to_root(level_2)
+
+		"""
+		now
+		level_2
+		  level_3
+		root_1
+		  level_1
+		root_2
+		root_3
+		"""
+		assert self.bv.move_component_to_component(level_3, level_1)
+		"""
+		now
+		level_2
+		root_1
+		  level_1
+		    level_3
+		root_2
+		root_3
+		"""
+		assert level_3.parent == level_1
+		assert len(list(level_2.components)) == 0
+
+		assert self.bv.move_component_to_component(level_2, level_3)
+		"""
+		now
+		root_1
+		  level_1
+		    level_3
+		      level_2
+		root_2
+		root_3
+		"""
+		assert level_2.parent == level_3
+		assert level_3.parent == level_1
+		assert level_1.parent == root_1
+		assert root_1.parent == self.bv.root_component
+
+		assert root_1 in list(self.bv.root_component.components)
+		assert self.bv.move_component_to_component(root_1, root_2)
+		"""
+		now
+		root_2
+		  root_1
+		    level_1
+		      level_3
+		        level_2
+		root_3
+		"""
+		assert root_1 not in list(self.bv.root_component.components)
+		assert root_1.parent == root_2
+		assert root_2.parent == self.bv.root_component
+
+		assert not self.bv.move_component_to_component(root_1, level_2)
+
+		guid = level_2.guid
+		self.bv.remove_component(root_2)
+		print(str(self.bv.root_component), file=sys.stderr)
+		assert self.bv.get_component(guid) is None
+
+	def test_components(self):
+		pC = self.bv.create_component()
+		c = self.bv.create_component(pC.guid)
+		guid = c.guid
+		c.name = "ACoolName"
+		self.assertEqual(c.name, "ACoolName")
+		f = self.bv.get_functions_by_name('main')[0]
+		c.add_function(f)
+		assert c.contains_function(f)
+		assert c.remove_function(f)
+		self.assertLenEqual(c.get_referenced_data_variables(), 0)
+		self.assertLenEqual(c.get_referenced_types(), 0)
+		assert not c.contains_function(f)
+
+		c.add_function(f)
+
+		assert pC.contains_component(c)
+		ppC = self.bv.create_component()
+		ppC.add_function(f)
+		self.bv.move_component_to_component(pC, ppC)
+		assert pC.parent == ppC
+		assert pC.parent != c
+
+		assert not self.bv.move_component_to_component(ppC, c)
+
+		self.bv.move_component_to_root(c)
+		assert not pC.contains_component(c)
 
 
 class TestArchitecture(TestWithBinaryView):

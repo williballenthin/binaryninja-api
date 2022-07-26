@@ -220,6 +220,7 @@ extern "C"
 	struct BNRepository;
 	struct BNRepoPlugin;
 	struct BNRepositoryManager;
+	struct BNComponent;
 	struct BNSettings;
 	struct BNMetadata;
 	struct BNReportCollection;
@@ -1379,6 +1380,9 @@ extern "C"
 		void (*sectionAdded)(void* ctxt, BNBinaryView* view, BNSection* section);
 		void (*sectionUpdated)(void* ctxt, BNBinaryView* view, BNSection* section);
 		void (*sectionRemoved)(void* ctxt, BNBinaryView* view, BNSection* section);
+		void (*componentUpdated)(void*ctxt, BNBinaryView* view, BNComponent* component);
+		void (*componentAdded)(void*ctxt, BNBinaryView* view, BNComponent* component);
+		void (*componentRemoved)(void*ctxt, BNBinaryView* view, BNComponent* component);
 	};
 
 	struct BNFileAccessor
@@ -3316,6 +3320,17 @@ extern "C"
 	BINARYNINJACOREAPI void BNFreeSegmentList(BNSegment** segments, size_t count);
 	BINARYNINJACOREAPI BNSegment* BNGetSegmentAt(BNBinaryView* view, uint64_t addr);
 	BINARYNINJACOREAPI bool BNGetAddressForDataOffset(BNBinaryView* view, uint64_t offset, uint64_t* addr);
+
+	BINARYNINJACOREAPI BNComponent* BNGetComponentByGuid(BNBinaryView* view, const char *guid);
+	BINARYNINJACOREAPI BNComponent* BNGetRootComponent(BNBinaryView* view);
+	BINARYNINJACOREAPI BNComponent* BNCreateComponent(BNBinaryView* view);
+	BINARYNINJACOREAPI BNComponent* BNCreateComponentWithParent(BNBinaryView* view, const char* parentGUID);
+	BINARYNINJACOREAPI BNComponent* BNCreateComponentWithName(BNBinaryView* view, const char *name);
+	BINARYNINJACOREAPI BNComponent* BNCreateComponentWithParentAndName(BNBinaryView* view, const char* parentGUID, const char *name);
+	BINARYNINJACOREAPI bool BNRemoveComponent(BNBinaryView* view, BNComponent* component);
+	BINARYNINJACOREAPI bool BNRemoveComponentByGuid(BNBinaryView* view, const char *guid);
+	BINARYNINJACOREAPI bool BNMoveComponentToParent(BNBinaryView* view, BNComponent* component, BNComponent* newParent);
+	BINARYNINJACOREAPI bool BNMoveComponentToRoot(BNBinaryView* view, BNComponent* component);
 
 	BINARYNINJACOREAPI void BNAddAutoSection(BNBinaryView* view, const char* name, uint64_t start, uint64_t length,
 	    BNSectionSemantics semantics, const char* type, uint64_t align, uint64_t entrySize, const char* linkedSection,
@@ -5907,6 +5922,36 @@ extern "C"
 	BINARYNINJACOREAPI BNRepositoryManager* BNGetRepositoryManager();
 
 	BINARYNINJACOREAPI BNRepository* BNRepositoryManagerGetDefaultRepository(BNRepositoryManager* r);
+
+	// Components
+
+	BINARYNINJACOREAPI BNComponent* BNNewComponentReference(BNComponent *component);
+	BINARYNINJACOREAPI void BNFreeComponent(BNComponent *component);
+
+	BINARYNINJACOREAPI BNFunction** BNComponentGetContainedFunctions(BNComponent *component, size_t *count);
+	BINARYNINJACOREAPI BNComponent** BNComponentGetContainedComponents(BNComponent *component, size_t *count);
+
+	BINARYNINJACOREAPI BNDataVariable* BNComponentGetReferencedDataVariables(BNComponent *component, size_t *count);
+	BINARYNINJACOREAPI BNDataVariable* BNComponentGetReferencedDataVariablesRecursive(BNComponent *component, size_t *count);
+	BINARYNINJACOREAPI BNType** BNComponentGetReferencedTypes(BNComponent *component, size_t *count);
+	BINARYNINJACOREAPI BNType** BNComponentGetReferencedTypesRecursive(BNComponent *component, size_t *count);
+
+	BINARYNINJACOREAPI void BNFreeComponents(BNComponent** components, size_t count);
+	BINARYNINJACOREAPI BNComponent* BNComponentGetParent(BNComponent* component);
+
+	BINARYNINJACOREAPI bool BNComponentContainsFunction(BNComponent* component, BNFunction *function);
+	BINARYNINJACOREAPI bool BNComponentContainsComponent(BNComponent *parent, BNComponent *component);
+	BINARYNINJACOREAPI bool BNComponentAddFunctionReference(BNComponent* component, BNFunction* function);
+	BINARYNINJACOREAPI bool BNComponentAddComponentReference(BNComponent *component, BNComponent *referenceComponent);
+	BINARYNINJACOREAPI void BNComponentAddAllMembersFromComponent(BNComponent *component, BNComponent *fromComponent);
+	BINARYNINJACOREAPI bool BNComponentRemoveFunctionReference(BNComponent *component, BNFunction *function);
+	BINARYNINJACOREAPI bool BNComponentRemoveComponentReference(BNComponent *component, BNComponent *referenceComponent);
+	BINARYNINJACOREAPI void BNComponentRemoveAllFunctions(BNComponent *component);
+	BINARYNINJACOREAPI char *BNComponentGetGuid(BNComponent *component);
+	BINARYNINJACOREAPI bool BNComponentsEqual(BNComponent* a, BNComponent* b);
+	BINARYNINJACOREAPI bool BNComponentsNotEqual(BNComponent* a, BNComponent* b);
+	BINARYNINJACOREAPI char *BNComponentGetName(BNComponent* component);
+	BINARYNINJACOREAPI void BNComponentSetName(BNComponent* component, const char* name);
 
 	// LLVM Services APIs
 	BINARYNINJACOREAPI void BNLlvmServicesInit(void);
