@@ -8,9 +8,10 @@
 #include <tuple>
 #include <unordered_map>
 
+#include "binaryninjacore.h"
 #include "binaryninjaapi.h"
-#include "lowlevelilinstruction.h"
-#include "mediumlevelilinstruction.h"
+#include "binaryninja/lowlevelilinstruction.hpp"
+#include "binaryninja/mediumlevelilinstruction.hpp"
 
 
 using namespace BinaryNinja;

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef _ACTIVITY_
+#define _ACTIVITY_
 #include "binaryninja_defs.h"
 
 extern "C" {
@@ -8,7 +9,7 @@ extern "C" {
 	struct BNHighLevelILFunction;
 	struct BNFunction;
 	struct BNBasicBlock;
-    struct BNActivity;
+	struct BNActivity;
 
 	// Analysis Context
 	BINARYNINJACOREAPI BNAnalysisContext* BNCreateAnalysisContext(void);
@@ -40,3 +41,4 @@ extern "C" {
 
 	BINARYNINJACOREAPI char* BNActivityGetName(BNActivity* activity);
 }
+#endif

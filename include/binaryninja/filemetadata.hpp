@@ -10,9 +10,9 @@ namespace BinaryNinja {
 	class SaveSettings;
 	class KeyValueStore;
 	class Database;
-	class MergeResult;
+	struct MergeResult;
 	class User;
-	class UndoEntry;
+	struct UndoEntry;
 
 	class NavigationHandler
 	{

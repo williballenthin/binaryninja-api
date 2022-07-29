@@ -8,9 +8,10 @@
 #include <tuple>
 #include <unordered_map>
 
+#include "binaryninjacore.h"
 #include "binaryninjaapi.h"
-#include "lowlevelilinstruction.h"
-#include "mediumlevelilinstruction.h"
+#include "binaryninja/lowlevelilinstruction.hpp"
+#include "binaryninja/mediumlevelilinstruction.hpp"
 
 
 using namespace BinaryNinja;
@@ -54,18 +55,18 @@ extern "C"
 			reader.Read32();
 			reader.Read32();
 			reader.Read64();
-			uint64_t namePtr = reader.Read64();
 			reader.Read64();
 			reader.Read64();
 			reader.Read64();
 			reader.Read64();
 			reader.Read64();
-			uint32_t methodListFlags = reader.Read32();
+			reader.Read64();
+			reader.Read32();
 			uint32_t methodListCount = reader.Read32();
 			for (uint32_t i = 0; i < methodListCount; i++)  // section end/symbol validation
 			{
 				uint64_t selector = reader.Read64();
-				uint64_t typePtr = reader.Read64();
+				reader.Read64();
 				uint64_t impPtr = reader.Read64();
 				// string methodName = reader.ReadCString(selector);
 				string typeEncoding = "";  // reader.ReadCString(typePtr);
@@ -87,7 +88,7 @@ extern "C"
 		lock.unlock();
 
 		bool updated = false;
-		uint8_t opcode[BN_MAX_INSTRUCTION_LENGTH];
+		// uint8_t opcode[BN_MAX_INSTRUCTION_LENGTH];
 		InstructionInfo iInfo;
 
 		// if (m_owner->IsAborted())
@@ -121,7 +122,7 @@ extern "C"
 					if ((params.size() >= 2) && (params[0].operation == LLIL_REG_SSA)
 					    && (params[1].operation == LLIL_REG_SSA))
 					{
-						auto selfSSAReg = params[0].GetSourceSSARegister<LLIL_REG_SSA>();
+						// auto selfSSAReg = params[0].GetSourceSSARegister<LLIL_REG_SSA>();
 						auto selSSAReg = params[1].GetSourceSSARegister<LLIL_REG_SSA>();
 						if (auto itr = classData.find(ssa->GetSSARegisterValue(selSSAReg).value);
 						    itr != classData.end())

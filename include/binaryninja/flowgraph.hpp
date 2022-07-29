@@ -9,7 +9,7 @@
 namespace BinaryNinja {
 	class FlowGraph;
 	class BasicBlock;
-	class DisassemblyTextLine;
+	struct DisassemblyTextLine;
 	class Function;
 	class BinaryView;
 	class LowLevelILFunction;

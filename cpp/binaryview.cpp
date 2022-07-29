@@ -742,7 +742,7 @@ std::vector<Ref<Tag>> Tag::ConvertAndFreeTagList(BNTag** tags, size_t count)
 
 Ref<TagType> Tag::GetTagTypeByNameFromView(Ref<BinaryView> view, const std::string& name)
 {
-	view->GetTagTypeByName(name);
+	return view->GetTagTypeByName(name);
 }
 
 

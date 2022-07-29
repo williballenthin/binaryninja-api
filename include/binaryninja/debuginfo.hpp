@@ -7,9 +7,9 @@
 #include "refcount.hpp"
 
 namespace BinaryNinja {
-	class NameAndType;
-	class DebugFunctionInfo;
-	class DataVariableAndName;
+	struct NameAndType;
+	struct DebugFunctionInfo;
+	struct DataVariableAndName;
 	class BinaryView;
 	class Type;
 	class CallingConvention;

@@ -9,7 +9,7 @@
 
 #include "binaryninjacore.h"
 #include "binaryninjaapi.h"
-#include "lowlevelilinstruction.h"
+#include "binaryninja/lowlevelilinstruction.hpp"
 
 using namespace BinaryNinja;
 using namespace std;

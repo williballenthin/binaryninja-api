@@ -30,6 +30,7 @@ class HighlightColor:
 			self._red = red
 			self._green = green
 			self._blue = blue
+			self._color = None
 		elif (mix_color is not None) and (mix is not None):
 			self._style = HighlightColorStyle.MixedHighlightColor
 			if color is None:

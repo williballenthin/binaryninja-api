@@ -11,9 +11,9 @@ namespace BinaryNinja {
 	class LowLevelILFunction;
 	class MediumLevelILFunction;
 	class HighLevelILFunction;
-	class LowLevelILInstruction;
-	class MediumLevelILInstruction;
-	class HighLevelILInstruction;
+	struct LowLevelILInstruction;
+	struct MediumLevelILInstruction;
+	struct HighLevelILInstruction;
 
 	struct PluginCommandContext
 	{
@@ -28,7 +28,7 @@ namespace BinaryNinja {
 		PluginCommandContext();
 	};
 
-	class HighLevelILInstruction;
+	struct HighLevelILInstruction;
 	class PluginCommand
 	{
 		BNPluginCommand m_command;

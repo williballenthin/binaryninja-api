@@ -24,10 +24,10 @@ namespace BinaryNinja {
 	class MediumLevelILFunction;
 	class Platform;
 	class QualifiedName;
-	class SSAVariable;
+	struct SSAVariable;
 	class Symbol;
 	class Tag;
-	class TagReference;
+	struct TagReference;
 	class TagType;
 	class Type;
 	class Workflow;

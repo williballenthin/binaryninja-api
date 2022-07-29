@@ -10,8 +10,9 @@
 #include <unordered_map>
 
 #include "binaryninjaapi.h"
-#include "lowlevelilinstruction.h"
-#include "mediumlevelilinstruction.h"
+#include "binaryninjacore.h"
+#include "binaryninja/lowlevelilinstruction.hpp"
+#include "binaryninja/mediumlevelilinstruction.hpp"
 
 
 using namespace BinaryNinja;

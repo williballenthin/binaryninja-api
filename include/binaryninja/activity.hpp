@@ -2,9 +2,11 @@
 
 #include <string>
 #include <vector>
+#include <variant>
 #include "json/json.h"
 #include "binaryninjacore/activity.h"
 #include "confidence.hpp"
+#include "architecture.hpp"
 
 namespace BinaryNinja
 {
@@ -39,10 +41,33 @@ namespace BinaryNinja
 		void SetHighLevelILFunction(Ref<HighLevelILFunction> highLevelIL);
 
 		bool Inform(const std::string& request);
-#if ((__cplusplus >= 201403L) || (_MSVC_LANG >= 201703L))
-		template <typename... Args> 
-		bool Inform(Args... args);
-#endif
+	#if ((__cplusplus >= 201403L) || (_MSVC_LANG >= 201703L))
+		template <class... Ts>
+		struct overload : Ts...
+		{
+			using Ts::operator()...;
+		};
+		template <class... Ts>
+		overload(Ts...) -> overload<Ts...>;
+
+		template <typename... Args>
+		bool Inform(Args... args)
+		{
+			// using T = std::variant<Args...>; // FIXME: remove type duplicates
+			using T = std::variant<std::string, const char*, uint64_t, Ref<Architecture>>;
+			std::vector<T> unpackedArgs {args...};
+			Json::Value request(Json::arrayValue);
+			for (auto& arg : unpackedArgs)
+				std::visit(overload {[&](Ref<Architecture> arch) { request.append(Json::Value(arch->GetName())); },
+								[&](uint64_t val) { request.append(Json::Value(val)); },
+								[&](auto& val) {
+									request.append(Json::Value(std::forward<decltype(val)>(val)));
+								}},
+					arg);
+
+			return Inform(Json::writeString(m_builder, request));
+		}
+	#endif
 	};
 
 	class Activity : public CoreRefCountObject<BNActivity, BNNewActivityReference, BNFreeActivity>

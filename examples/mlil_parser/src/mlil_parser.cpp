@@ -2,7 +2,7 @@
 #include <inttypes.h>
 #include "binaryninjacore.h"
 #include "binaryninjaapi.h"
-#include "mediumlevelilinstruction.h"
+#include "binaryninja/mediumlevelilinstruction.hpp"
 
 using namespace BinaryNinja;
 using namespace std;

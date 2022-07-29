@@ -2,6 +2,7 @@
 #include <QtWidgets/QHBoxLayout>
 #include <algorithm>
 #include <vector>
+#include "binaryninjacore.h"
 #include "sections.h"
 #include "headers.h"
 #include "fontsettings.h"

@@ -1,3 +1,1 @@
-#pragma once
-
-#include <binaryninjacore/binaryninjacore.h>
+#include "binaryninjacore/binaryninjacore.h"

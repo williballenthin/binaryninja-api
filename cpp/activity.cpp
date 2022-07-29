@@ -8,7 +8,6 @@
 #include "binaryninja/activity.hpp"
 #include <string>
 #include <typeinfo>
-#include <variant>
 
 using namespace BinaryNinja;
 using namespace std;
@@ -105,34 +104,6 @@ bool AnalysisContext::Inform(const string& request)
 	return BNAnalysisContextInform(m_object, request.c_str());
 }
 
-
-#if ((__cplusplus >= 201403L) || (_MSVC_LANG >= 201703L))
-template <class... Ts>
-struct overload : Ts...
-{
-	using Ts::operator()...;
-};
-template <class... Ts>
-overload(Ts...) -> overload<Ts...>;
-
-template <typename... Args>
-bool AnalysisContext::Inform(Args... args)
-{
-	// using T = std::variant<Args...>; // FIXME: remove type duplicates
-	using T = std::variant<std::string, const char*, uint64_t, Ref<Architecture>>;
-	std::vector<T> unpackedArgs {args...};
-	Json::Value request(Json::arrayValue);
-	for (auto& arg : unpackedArgs)
-		std::visit(overload {[&](Ref<Architecture> arch) { request.append(Json::Value(arch->GetName())); },
-						[&](uint64_t val) { request.append(Json::Value(val)); },
-						[&](auto& val) {
-							request.append(Json::Value(std::forward<decltype(val)>(val)));
-						}},
-			arg);
-
-	return Inform(Json::writeString(m_builder, request));
-}
-#endif
 
 Activity::Activity(const string& name, const std::function<void(Ref<AnalysisContext> analysisContext)>& action) :
     m_action(action)

@@ -31,7 +31,7 @@ if(BN_INTERNAL_BUILD)
 		DEPENDS ${PYTHON_SOURCES} ${PROJECT_SOURCE_DIR}/../binaryninjacore.h $<TARGET_FILE:generator>
 		COMMAND ${CMAKE_COMMAND} -E echo "Copying Python Sources"
 		COMMAND ${CMAKE_COMMAND} -E make_directory ${BN_RESOURCE_DIR}/python/binaryninja/
-		COMMAND ${CMAKE_COMMAND} -E env ASAN_OPTIONS=detect_leaks=0 $<TARGET_FILE:generator> ${PROJECT_SOURCE_DIR}/../binaryninjacore.h ${PROJECT_SOURCE_DIR}/_binaryninjacore.py ${PROJECT_SOURCE_DIR}/enums.py
+		COMMAND ${CMAKE_COMMAND} -E env ASAN_OPTIONS=detect_leaks=0 $<TARGET_FILE:generator> '${PROJECT_SOURCE_DIR}/../include/binaryninjacore/binaryninjacore.h' '${PROJECT_SOURCE_DIR}/_binaryninjacore.py' '${PROJECT_SOURCE_DIR}/enums.py' '${PROJECT_SOURCE_DIR}/../include/'
 		COMMAND ${CMAKE_COMMAND} -E copy ${PYTHON_SOURCES} ${BN_RESOURCE_DIR}/python/binaryninja/
 		COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/_binaryninjacore.py ${BN_RESOURCE_DIR}/python/binaryninja/
 		COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/enums.py ${BN_RESOURCE_DIR}/python/binaryninja/)

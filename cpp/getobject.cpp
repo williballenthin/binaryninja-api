@@ -120,54 +120,54 @@ Ref<Type> CreateNewReferencedType(BNType* type)
 	return type ? new Type(BNNewTypeReference(type)) : nullptr;
 }
 
-Ref<BinaryView> BinaryNinja::CreateNewView(BNBinaryView* view)
+Ref<BinaryView> CreateNewView(BNBinaryView* view)
 {
 	return view ? new BinaryView(view) : nullptr;
 }
 
 
-Ref<Function> BinaryNinja::CreateNewFunction(BNFunction* func)
+Ref<Function> CreateNewFunction(BNFunction* func)
 {
 	return func ? new Function(func) : nullptr;
 }
 
 
-Ref<BasicBlock> BinaryNinja::CreateNewBasicBlock(BNBasicBlock* block)
+Ref<BasicBlock> CreateNewBasicBlock(BNBasicBlock* block)
 {
 	return block ? new BasicBlock(block) : nullptr;
 }
 
 
-Ref<LowLevelILFunction> BinaryNinja::CreateNewLowLevelILFunction(BNLowLevelILFunction* func)
+Ref<LowLevelILFunction> CreateNewLowLevelILFunction(BNLowLevelILFunction* func)
 {
 	return func ? new LowLevelILFunction(func) : nullptr;
 }
 
 
-Ref<MediumLevelILFunction> BinaryNinja::CreateNewMediumLevelILFunction(BNMediumLevelILFunction* func)
+Ref<MediumLevelILFunction> CreateNewMediumLevelILFunction(BNMediumLevelILFunction* func)
 {
 	return func ? new MediumLevelILFunction(func) : nullptr;
 }
 
 
-Ref<HighLevelILFunction> BinaryNinja::CreateNewHighLevelILFunction(BNHighLevelILFunction* func)
+Ref<HighLevelILFunction> CreateNewHighLevelILFunction(BNHighLevelILFunction* func)
 {
 	return func ? new HighLevelILFunction(func) : nullptr;
 }
 
 
-Ref<Type> BinaryNinja::CreateNewType(BNType* type)
+Ref<Type> CreateNewType(BNType* type)
 {
 	return type ? new Type(type) : nullptr;
 }
 
 
-Ref<Platform> BinaryNinja::CreateNewPlatform(BNPlatform* platform)
+Ref<Platform> CreateNewPlatform(BNPlatform* platform)
 {
 	return platform ? new Platform(platform) : nullptr;
 }
 
-Ref<Architecture> BinaryNinja::CreateNewCoreArchitecture(BNArchitecture* arch)
+Ref<Architecture> CreateNewCoreArchitecture(BNArchitecture* arch)
 {
 	return arch ? new CoreArchitecture(arch) : nullptr;
 }

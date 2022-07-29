@@ -13,7 +13,7 @@ namespace BinaryNinja
 {
 	class FileMetadata;
 	class Database;
-	class UndoEntry;
+	struct UndoEntry;
 	class BinaryView;
 
 	struct DatabaseException : std::runtime_error

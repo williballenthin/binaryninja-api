@@ -8,7 +8,7 @@ namespace BinaryNinja {
 	class Function;
 	class Architecture;
 	class BasicBlock;
-	class SSARegister;
+	struct SSARegister;
 	class HighLevelILFunction;
 
 	struct MediumLevelILLabel : public BNMediumLevelILLabel

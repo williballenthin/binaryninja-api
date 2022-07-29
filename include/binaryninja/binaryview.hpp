@@ -25,7 +25,7 @@ namespace BinaryNinja
 	class FileAccessor;
 	class FileMetadata;
 	class FlowGraph;
-	class LinearDisassemblyLine;
+	struct LinearDisassemblyLine;
 	class Logger;
 	class Metadata;
 	class NameSpace;
@@ -39,11 +39,11 @@ namespace BinaryNinja
 	class Structure;
 	class Symbol;
 	class Tag;
-	class TagReference;
+	struct TagReference;
 	class TagType;
 	class Type;
-	class TypeReferenceSource;
-	class UndoEntry;
+	struct TypeReferenceSource;
+	struct UndoEntry;
 	class User;
 	class Workflow;
 	struct PossibleValueSet;

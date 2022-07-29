@@ -2,6 +2,7 @@
 #include <inttypes.h>
 #include <stdio.h>
 #include <string.h>
+#include "binaryninjacore.h"
 #include "binaryninjaapi.h"
 #include "asmx86/asmx86.h"
 

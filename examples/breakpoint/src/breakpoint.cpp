@@ -1,5 +1,6 @@
 #include <inttypes.h>
 #include "binaryninjaapi.h"
+#include "binaryninjacore.h"
 
 using namespace BinaryNinja;
 using namespace std;

@@ -18,6 +18,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 
+#include <fstream>
 #include <stdio.h>
 #include <inttypes.h>
 #include "binaryninjaapi.h"
@@ -225,7 +226,9 @@ void OutputSwizzledType(FILE* out, Type* type)
 		break;
 	}
 }
-
+#define RED "\033[0;31m"
+#define ORANGE "\033[0;33m"
+#define NC "\033[0m"
 
 int main(int argc, char* argv[])
 {
@@ -237,25 +240,59 @@ int main(int argc, char* argv[])
 
 	// Parse API header to get type and function information
 	map<QualifiedName, Ref<Type>> types, vars, funcs;
-	string errors;
+	vector<TypeParserError> errors;
 	auto arch = new CoreArchitecture(BNGetNativeTypeParserArchitecture());
 
 	string oldParser;
 	if (Settings::Instance()->Contains("analysis.types.parserNamer"))
 		oldParser = Settings::Instance()->Get<string>("analysis.types.parserNamer");
-	Settings::Instance()->Set("analysis.types.parserName", "CoreTypeParser");
+	Settings::Instance()->Set("analysis.types.parserName", "ClangTypeParser");
 
-	bool ok = arch->GetStandalonePlatform()->ParseTypesFromSourceFile(argv[1], types, vars, funcs, errors);
+	std::ifstream input(argv[1]);
+	if (!input.is_open())
+	{
+		LogError("Unable to open %s", argv[1]);
+		return 1;
+	}
+	string source;
+	input >> source;
+	input.close();
+
+	TypeParserResult result;
+	auto parser = TypeParser::GetByName("ClangTypeParser");
+	bool ok = parser->ParseTypesFromSource(source, argv[1], arch->GetStandalonePlatform(), {}, {}, {argv[4],
+		"/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/",
+		"/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/13.0.0/include",
+		"/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include",
+		"/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"},
+		"",
+		result,
+		errors);
 
 	if (!oldParser.empty())
 		Settings::Instance()->Set("analysis.types.parserName", oldParser);
 	else
 		Settings::Instance()->Reset("analysis.types.parserName");
 
-	fprintf(stderr, "Errors: %s\n", errors.c_str());
 	if (!ok)
+	{
+		fprintf(stderr, RED "Failed to parse binaryninjacore.h while generating python bindings!\n");
+		for (const auto &error : errors)
+		{
+			switch (error.severity)
+			{
+			case ErrorSeverity:
+				fprintf(stderr, "\t" RED "Error" NC ": %s:%llu:%llu - %s\n", error.fileName.c_str(), error.line, error.column, error.message.c_str());
+				break;
+			case WarningSeverity:
+				fprintf(stderr, "\t" ORANGE "Warning" NC ": %s:%llu:%llu - %s\n", error.fileName.c_str(), error.line, error.column, error.message.c_str());
+				break;
+			default:
+				break;
+			}
+		}
 		return 1;
-
+	}
 	FILE* out = fopen(argv[2], "w");
 	FILE* enums = fopen(argv[3], "w");
 
@@ -298,19 +335,19 @@ int main(int argc, char* argv[])
 
 	// Create type objects
 	fprintf(out, "# Type definitions\n");
-	for (auto& i : types)
+	for (auto& i : result.types)
 	{
 		string name;
-		if (i.first.size() != 1)
+		if (i.name.size() != 1)
 			continue;
-		name = i.first[0];
-		if (i.second->GetClass() == StructureTypeClass)
+		name = i.name[0];
+		if (i.type->GetClass() == StructureTypeClass)
 		{
 			fprintf(out, "class %s(ctypes.Structure):\n", name.c_str());
 
 			// python uses str's, C uses byte-arrays
 			bool stringField = false;
-			for (auto& arg : i.second->GetStructure()->GetMembers())
+			for (auto& arg : i.type->GetStructure()->GetMembers())
 			{
 				if ((arg.type->GetClass() == PointerTypeClass) && (arg.type->GetChildType()->GetWidth() == 1)
 				    && (arg.type->GetChildType()->IsSigned()))
@@ -328,7 +365,7 @@ int main(int argc, char* argv[])
 
 			fprintf(out, "\n\n%sHandle = ctypes.POINTER(%s)\n\n\n", name.c_str(), name.c_str());
 		}
-		else if (i.second->GetClass() == EnumerationTypeClass)
+		else if (i.type->GetClass() == EnumerationTypeClass)
 		{
 			if (name.size() > 2 && name.substr(0, 2) == "BN")
 				name = name.substr(2);
@@ -336,16 +373,16 @@ int main(int argc, char* argv[])
 			fprintf(out, "%sEnum = ctypes.c_int\n", name.c_str());
 
 			fprintf(enums, "\n\nclass %s(enum.IntEnum):\n", name.c_str());
-			for (auto& j : i.second->GetEnumeration()->GetMembers())
+			for (auto& j : i.type->GetEnumeration()->GetMembers())
 			{
 				fprintf(enums, "\t%s = %" PRId64 "\n", j.name.c_str(), j.value);
 			}
 		}
-		else if ((i.second->GetClass() == BoolTypeClass) || (i.second->GetClass() == IntegerTypeClass)
-		         || (i.second->GetClass() == FloatTypeClass) || (i.second->GetClass() == ArrayTypeClass))
+		else if ((i.type->GetClass() == BoolTypeClass) || (i.type->GetClass() == IntegerTypeClass)
+		         || (i.type->GetClass() == FloatTypeClass) || (i.type->GetClass() == ArrayTypeClass))
 		{
 			fprintf(out, "%s = ", name.c_str());
-			OutputType(out, i.second);
+			OutputType(out, i.type);
 			fprintf(out, "\n");
 		}
 	}
@@ -353,8 +390,8 @@ int main(int argc, char* argv[])
 	fprintf(out, "\n# Structure definitions\n");
 	set<QualifiedName> structsToProcess;
 	set<QualifiedName> finishedStructs;
-	for (auto& i : types)
-		structsToProcess.insert(i.first);
+	for (auto& i : result.types)
+		structsToProcess.insert(i.name);
 	while (structsToProcess.size() != 0)
 	{
 		set<QualifiedName> currentStructList = structsToProcess;
@@ -424,20 +461,20 @@ int main(int argc, char* argv[])
 	}
 
 	fprintf(out, "\n# Function definitions\n");
-	for (auto& i : funcs)
+	for (auto& i : result.functions)
 	{
 		string name;
-		if (i.first.size() != 1)
+		if (i.name.size() != 1)
 			continue;
-		name = i.first[0];
+		name = i.name[0];
 
 		// Check for a string result, these will be automatically wrapped to free the string
 		// memory and return a Python string
-		bool stringResult = (i.second->GetChildType()->GetClass() == PointerTypeClass)
-		                    && (i.second->GetChildType()->GetChildType()->GetWidth() == 1)
-		                    && (i.second->GetChildType()->GetChildType()->IsSigned());
+		bool stringResult = (i.type->GetChildType()->GetClass() == PointerTypeClass)
+		                    && (i.type->GetChildType()->GetChildType()->GetWidth() == 1)
+		                    && (i.type->GetChildType()->GetChildType()->IsSigned());
 		// Pointer returns will be automatically wrapped to return None on null pointer
-		bool pointerResult = (i.second->GetChildType()->GetClass() == PointerTypeClass);
+		bool pointerResult = (i.type->GetChildType()->GetClass() == PointerTypeClass);
 
 		// From python -> C python3 requires str -> str.encode('charmap')
 		bool swizzleArgs = true;
@@ -463,12 +500,12 @@ int main(int argc, char* argv[])
 		fprintf(out, "# %s\n\n", funcName.c_str());
 		fprintf(out, "%s = core.%s\n", funcName.c_str(), name.c_str());
 		fprintf(out, "%s.restype = ", funcName.c_str());
-		OutputType(out, i.second->GetChildType(), true, callbackConvention);
+		OutputType(out, i.type->GetChildType(), true, callbackConvention);
 		fprintf(out, "\n");
-		if (!i.second->HasVariableArguments())
+		if (!i.type->HasVariableArguments())
 		{
 			fprintf(out, "%s.argtypes = [\n", funcName.c_str());
-			for (auto& j : i.second->GetParameters())
+			for (auto& j : i.type->GetParameters())
 			{
 				fprintf(out, "\t\t");
 				if (name == "BNFreeString" || name == "BNRustFreeString")
@@ -508,10 +545,10 @@ int main(int argc, char* argv[])
 		}
 		fprintf(out, "\n\n\n# noinspection PyPep8Naming\n");
 		fprintf(out, "def %s(", name.c_str());
-		if (!i.second->HasVariableArguments())
+		if (!i.type->HasVariableArguments())
 		{
 			size_t argN = 0;
-			for (auto& arg : i.second->GetParameters())
+			for (auto& arg : i.type->GetParameters())
 			{
 				string argName = arg.name;
 				if (g_pythonKeywordReplacements.find(argName) != g_pythonKeywordReplacements.end())
@@ -534,14 +571,14 @@ int main(int argc, char* argv[])
 		fprintf(out, "\n\t\t) -> ");
 		if (stringResult || pointerResult)
 			fprintf(out, "Optional[");
-		OutputSwizzledType(out, i.second->GetChildType());
+		OutputSwizzledType(out, i.type->GetChildType());
 		if (stringResult || pointerResult)
 			fprintf(out, "]");
 		fprintf(out, ":\n");
 
 		string stringArgFuncCall = funcName + "(";
 		size_t argN = 0;
-		for (auto& arg : i.second->GetParameters())
+		for (auto& arg : i.type->GetParameters())
 		{
 			string argName = arg.name;
 			if (g_pythonKeywordReplacements.find(argName) != g_pythonKeywordReplacements.end())

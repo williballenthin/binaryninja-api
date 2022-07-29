@@ -171,7 +171,7 @@ namespace BinaryNinja {
 			if (obj.m_obj)
 				m_assignmentTrace = BNRegisterObjectRefDebugTrace(typeid(T).name());
 #endif
-			T* oldObj = m_obj;
+			// T* oldObj = m_obj;
 			m_obj = obj.m_obj;
 			// if (m_obj)
 			// 	m_obj->AddRef();
@@ -205,7 +205,7 @@ namespace BinaryNinja {
 			if (obj)
 				m_assignmentTrace = BNRegisterObjectRefDebugTrace(typeid(T).name());
 #endif
-			T* oldObj = m_obj;
+			// T* oldObj = m_obj;
 			m_obj = obj;
 			// if (m_obj)
 			// 	m_obj->AddRef();
