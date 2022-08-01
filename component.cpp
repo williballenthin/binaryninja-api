@@ -126,13 +126,13 @@ std::string Component::GetName()
 
 void Component::SetName(const std::string &name)
 {
-	BNComponentSetName(m_object, name.c_str());
+	BNComponentSetName(m_view->m_object, m_object, name.c_str());
 }
 
 
 Ref<Component> Component::GetParent()
 {
-	return new Component(m_view, BNComponentGetParent(m_object));
+	return new Component(m_view, BNComponentGetParent(m_view->m_object, m_object));
 }
 
 
@@ -144,27 +144,13 @@ std::string Component::GetGuid()
 
 bool Component::AddFunction(Ref<Function> func)
 {
-	return BNComponentAddFunctionReference(m_object, func->GetObject());
+	return BNComponentAddFunctionReference(m_view->m_object, m_object, func->GetObject());
 }
 
 
 bool Component::RemoveFunction(Ref<Function> func)
 {
-	return BNComponentRemoveFunctionReference(m_object, func->GetObject());
-}
-
-
-bool Component::AddComponent(Ref<Component> component)
-{
-	bool success = BNComponentAddComponentReference(m_object, component->GetObject());
-	return success;
-}
-
-
-bool Component::RemoveComponent(Ref<Component> component)
-{
-	bool success = BNComponentRemoveComponentReference(m_object, component->GetObject());
-	return success;
+	return BNComponentRemoveFunctionReference(m_view->m_object, m_object, func->GetObject());
 }
 
 

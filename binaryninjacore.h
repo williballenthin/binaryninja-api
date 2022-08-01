@@ -5937,21 +5937,21 @@ extern "C"
 	BINARYNINJACOREAPI BNType** BNComponentGetReferencedTypesRecursive(BNComponent *component, size_t *count);
 
 	BINARYNINJACOREAPI void BNFreeComponents(BNComponent** components, size_t count);
-	BINARYNINJACOREAPI BNComponent* BNComponentGetParent(BNComponent* component);
+	BINARYNINJACOREAPI BNComponent* BNComponentGetParent(BNBinaryView* view, BNComponent* component);
 
 	BINARYNINJACOREAPI bool BNComponentContainsFunction(BNComponent* component, BNFunction *function);
 	BINARYNINJACOREAPI bool BNComponentContainsComponent(BNComponent *parent, BNComponent *component);
-	BINARYNINJACOREAPI bool BNComponentAddFunctionReference(BNComponent* component, BNFunction* function);
-	BINARYNINJACOREAPI bool BNComponentAddComponentReference(BNComponent *component, BNComponent *referenceComponent);
-	BINARYNINJACOREAPI void BNComponentAddAllMembersFromComponent(BNComponent *component, BNComponent *fromComponent);
-	BINARYNINJACOREAPI bool BNComponentRemoveFunctionReference(BNComponent *component, BNFunction *function);
-	BINARYNINJACOREAPI bool BNComponentRemoveComponentReference(BNComponent *component, BNComponent *referenceComponent);
-	BINARYNINJACOREAPI void BNComponentRemoveAllFunctions(BNComponent *component);
+	BINARYNINJACOREAPI bool BNComponentAddFunctionReference(BNBinaryView* view, BNComponent* component, BNFunction* function);
+	BINARYNINJACOREAPI bool BNComponentAddComponentReference(BNBinaryView* view, BNComponent *component, BNComponent *referenceComponent);
+	BINARYNINJACOREAPI void BNComponentAddAllMembersFromComponent(BNBinaryView* view, BNComponent *component, BNComponent *fromComponent);
+	BINARYNINJACOREAPI bool BNComponentRemoveFunctionReference(BNBinaryView* view, BNComponent *component, BNFunction *function);
+	BINARYNINJACOREAPI bool BNComponentRemoveComponentReference(BNBinaryView* view, BNComponent *component, BNComponent *referenceComponent);
+	BINARYNINJACOREAPI void BNComponentRemoveAllFunctions(BNBinaryView* view, BNComponent *component);
 	BINARYNINJACOREAPI char *BNComponentGetGuid(BNComponent *component);
 	BINARYNINJACOREAPI bool BNComponentsEqual(BNComponent* a, BNComponent* b);
 	BINARYNINJACOREAPI bool BNComponentsNotEqual(BNComponent* a, BNComponent* b);
 	BINARYNINJACOREAPI char *BNComponentGetName(BNComponent* component);
-	BINARYNINJACOREAPI void BNComponentSetName(BNComponent* component, const char* name);
+	BINARYNINJACOREAPI void BNComponentSetName(BNBinaryView* view, BNComponent* component, const char* name);
 
 	// LLVM Services APIs
 	BINARYNINJACOREAPI void BNLlvmServicesInit(void);

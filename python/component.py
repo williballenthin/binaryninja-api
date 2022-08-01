@@ -129,7 +129,7 @@ class ComponentTests(ScriptBasedTestRunner):
         for i in c.components:
             _out.append('  ' * depth + repr(i))
             _out = self.sprawl_component(i, depth+1, '\n'.join(_out)).split('\n')
-        return '\n'.join(_out)
+        
 
 ComponentTests.run_tests()
 
@@ -182,13 +182,13 @@ class Component:
         return '\n'.join(_out)
 
     def add_function(self, func: function.Function) -> bool:
-        return core.BNComponentAddFunctionReference(self.handle, func.handle)
+        return core.BNComponentAddFunctionReference(self.view.handle, self.handle, func.handle)
 
     def contains_function(self, func: function.Function) -> bool:
         return core.BNComponentContainsFunction(self.handle, func.handle)
 
     def remove_function(self, func: function.Function) -> bool:
-        return core.BNComponentRemoveFunctionReference(self.handle, func.handle)
+        return core.BNComponentRemoveFunctionReference(self.view.handle, self.handle, func.handle)
 
     def contains_component(self, component: 'Component') -> bool:
         return core.BNComponentContainsComponent(self.handle, component.handle)
@@ -200,14 +200,14 @@ class Component:
 
     @name.setter
     def name(self, _name):
-        core.BNComponentSetName(self.handle, _name)
+        core.BNComponentSetName(self.view.handle, self.handle, _name)
 
     @property
     def parent(self) -> Optional['Component']:
         """
         The component that contains this component, if it exists.
         """
-        bn_component = core.BNComponentGetParent(self.handle)
+        bn_component = core.BNComponentGetParent(self.view.handle, self.handle)
         if bn_component is not None:
             return Component(self.view, bn_component)
         return None
