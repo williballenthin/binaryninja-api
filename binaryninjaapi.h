@@ -7124,28 +7124,97 @@ namespace BinaryNinja {
 		virtual bool DeleteData(const std::string& key) override;
 	};
 
+	/*!
+		Class wrapping components.
+	 */
 	class Component : public CoreRefCountObject<BNComponent, BNNewComponentReference, BNFreeComponent>
 	{
 		Ref<BinaryView> m_view;
 	public:
 		Component(Ref<BinaryView> view, BNComponent* type);
+
+		/*!
+		    Get the unique identifier for this component.
+
+			\return Component GUID
+		*/
 		std::string GetGuid();
 
 		bool operator==(const Component& other) const;
 		bool operator!=(const Component& other) const;
 
+		/*!
+			The display name for the component
+
+			\return Component name
+		 */
 		std::string GetName();
+
+		/*!
+		    Set the display name for the component
+
+		    \param name New component name.
+		    \return
+		 */
 		void SetName(const std::string &name);
+
+		/*!
+			Get the parent component. If it's a top level component, it will return the "root" Component.
+
+			\return Parent Component
+		*/
 		Ref<Component> GetParent();
 
-		bool AddFunction(Ref<Function> func);
-		bool AddComponent(Ref<Component> component);
-		bool RemoveFunction(Ref<Function> func);
-		bool RemoveComponent(Ref<Component> component);
+		/*!
+			Set the display name for the component
 
+			\param func Function to add.
+			\return True if the function was successfully added.
+		 */
+		bool AddFunction(Ref<Function> func);
+
+		/*!
+		    Move a component to this component.
+
+			\param component Component to add.
+			\return True if the component was successfully added.
+		*/
+		bool AddComponent(Ref<Component> component);
+
+		/*!
+		    Remove a function
+
+			\param func Function to remove
+			\return True if the function was successfully removed.
+		*/
+		bool RemoveFunction(Ref<Function> func);
+
+		/*!
+			Get a list of types referenced by the functions in this Component.
+
+			\return vector of Type objects
+		*/
 		std::vector<Ref<Type>> GetReferencedTypes();
+
+		/*!
+		    Get a list of components contained by this component.
+
+			\return vector of Component objects
+		*/
 		std::vector<Ref<Component>> GetContainedComponents();
+
+		/*!
+			Get a list of functions contained within this Component.
+
+			\return vector of Function objects
+		*/
 		std::vector<Ref<Function>> GetContainedFunctions();
+
+		/*!
+			Get a list of DataVaribles referenced by the functions in this Component.
+
+			\return vector of DataVariable objects
+		*/
 		std::vector<DataVariable> GetReferencedDataVariables();
 	};
 

@@ -182,15 +182,48 @@ class Component:
         return '\n'.join(_out)
 
     def add_function(self, func: function.Function) -> bool:
+        """
+        Add function to this component.
+
+        :param func: Function to add
+        :return: True if function was successfully added.
+        """
         return core.BNComponentAddFunctionReference(self.view.handle, self.handle, func.handle)
 
     def contains_function(self, func: function.Function) -> bool:
+        """
+        Check whether this component contains a function.
+
+        :param func: Function to check
+        :return: True if this component contains the function.
+        """
         return core.BNComponentContainsFunction(self.handle, func.handle)
 
+    def add_component(self, component: 'Component') -> bool:
+        """
+        Move component to this component.
+
+        :param component: Component to add to this component.
+        :return: True if the component was successfully moved to this component
+        """
+        return core.BNMoveComponentToParent(self.view.handle, component.handle, self.handle)
+
     def remove_function(self, func: function.Function) -> bool:
+        """
+        Remove function from this component.
+
+        :param func: Function to remove
+        :return: True if function was successfully removed.
+        """
         return core.BNComponentRemoveFunctionReference(self.view.handle, self.handle, func.handle)
 
     def contains_component(self, component: 'Component') -> bool:
+        """
+        Check whether this component contains a component.
+
+        :param component: Component to check
+        :return: True if this component contains the component.
+        """
         return core.BNComponentContainsComponent(self.handle, component.handle)
 
     @property
@@ -265,6 +298,12 @@ class Component:
         return iter(FunctionIterator(self.view, self))
 
     def get_referenced_data_variables(self, recursive=False):
+        """
+        Get data variables referenced by this component
+
+        :param recursive: Optional; Get all DataVariables referenced by this component and subcomponents.
+        :return: List of DataVariables
+        """
         data_vars = []
         count = ctypes.c_ulonglong(0)
         if recursive:
@@ -281,6 +320,12 @@ class Component:
         return data_vars
 
     def get_referenced_types(self, recursive=False):
+        """
+        Get Types referenced by this component
+
+        :param recursive: Optional; Get all Types referenced by this component and subcomponents.
+        :return: List of Types
+        """
         types = []
         count = ctypes.c_ulonglong(0)
 

@@ -148,6 +148,12 @@ bool Component::AddFunction(Ref<Function> func)
 }
 
 
+bool Component::AddComponent(Ref<Component> component)
+{
+	return BNMoveComponentToParent(m_view->m_object, component->m_object, m_object);
+}
+
+
 bool Component::RemoveFunction(Ref<Function> func)
 {
 	return BNComponentRemoveFunctionReference(m_view->m_object, m_object, func->GetObject());

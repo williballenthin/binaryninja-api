@@ -5848,13 +5848,19 @@ class BinaryView:
 
 	def create_component(self, parent_guid: Optional[str] = None) -> component.Component:
 		if parent_guid:
-			return component.Component(self, core.BNCreateComponentWithParent(self.handle, parent_guid))
+			if core.BNGetComponentByGuid(self.handle, parent_guid):
+				return component.Component(self, core.BNCreateComponentWithParent(self.handle, parent_guid))
+			else:
+				return component.Component(self, core.BNCreateComponent(self.handle))
 		else:
 			return component.Component(self, core.BNCreateComponent(self.handle))
 
 	def create_component_with_name(self, name: str, parent_guid: Optional[str] = None):
 		if parent_guid:
-			return component.Component(self, core.BNCreateComponentWithParentAndName(self.handle, parent_guid, name))
+			if core.BNGetComponentByGuid(self.handle, parent_guid):
+				return component.Component(self, core.BNCreateComponentWithParentAndName(self.handle, parent_guid, name))
+			else:
+				return component.Component(self, core.BNCreateComponentWithName(self.handle, name))
 		else:
 			return component.Component(self, core.BNCreateComponentWithName(self.handle, name))
 
