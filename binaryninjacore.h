@@ -3711,6 +3711,7 @@ extern "C"
 	BINARYNINJACOREAPI uint64_t BNGetFunctionHighestAddress(BNFunction* func);
 	BINARYNINJACOREAPI uint64_t BNGetFunctionLowestAddress(BNFunction* func);
 	BINARYNINJACOREAPI BNAddressRange* BNGetFunctionAddressRanges(BNFunction* func, size_t* count);
+	BINARYNINJACOREAPI BNComponent** BNGetFunctionParentComponents(BNFunction *func, size_t* count);
 
 	BINARYNINJACOREAPI BNLowLevelILFunction* BNGetFunctionLowLevelIL(BNFunction* func);
 	BINARYNINJACOREAPI BNLowLevelILFunction* BNGetFunctionLowLevelILIfAvailable(BNFunction* func);

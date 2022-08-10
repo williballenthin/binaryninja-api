@@ -3853,6 +3853,7 @@ namespace BinaryNinja {
 	};
 
 	class FlowGraph;
+	class Component;
 	struct SSAVariable;
 
 	class Function : public CoreRefCountObject<BNFunction, BNNewFunctionReference, BNFreeFunction>
@@ -3873,6 +3874,7 @@ namespace BinaryNinja {
 		Confidence<bool> CanReturn() const;
 		bool HasExplicitlyDefinedType() const;
 		bool NeedsUpdate() const;
+		std::vector<Ref<Component>> GetParentComponents() const;
 
 		std::vector<Ref<BasicBlock>> GetBasicBlocks() const;
 		Ref<BasicBlock> GetBasicBlockAtAddress(Architecture* arch, uint64_t addr) const;
@@ -7142,6 +7144,8 @@ namespace BinaryNinja {
 
 		bool operator==(const Component& other) const;
 		bool operator!=(const Component& other) const;
+
+		Ref<BinaryView> GetView() const { return m_view; };
 
 		/*!
 			The display name for the component

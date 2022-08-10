@@ -8,7 +8,7 @@ from . import binaryview
 
 from . import function
 from . import _binaryninjacore as core
-from binaryninja.types import Type
+from . import types
 
 """
 from typing import Iterable
@@ -181,7 +181,7 @@ class Component:
             _out = self._sprawl_component(i, depth+1, '\n'.join(_out)).split('\n')
         return '\n'.join(_out)
 
-    def add_function(self, func: function.Function) -> bool:
+    def add_function(self, func: 'function.Function') -> bool:
         """
         Add function to this component.
 
@@ -190,7 +190,7 @@ class Component:
         """
         return core.BNComponentAddFunctionReference(self.view.handle, self.handle, func.handle)
 
-    def contains_function(self, func: function.Function) -> bool:
+    def contains_function(self, func: 'function.Function') -> bool:
         """
         Check whether this component contains a function.
 
@@ -208,7 +208,7 @@ class Component:
         """
         return core.BNMoveComponentToParent(self.view.handle, component.handle, self.handle)
 
-    def remove_function(self, func: function.Function) -> bool:
+    def remove_function(self, func: 'function.Function') -> bool:
         """
         Remove function from this component.
 
@@ -272,7 +272,7 @@ class Component:
         return iter(SubComponentIterator(self.view, self))
 
     @property
-    def functions(self) -> Iterator['Component']:
+    def functions(self) -> Iterator['function.Function']:
         """
 		``functions`` is an iterator for all Functions contained within this Component
 
@@ -335,6 +335,6 @@ class Component:
             bn_types = core.BNComponentGetReferencedTypes(self.handle, count)
 
         for i in range(count.value):
-            types.append(Type(bn_types[i]))
+            types.append(types.Type(bn_types[i]))
 
         return types
