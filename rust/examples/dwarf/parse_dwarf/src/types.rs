@@ -1,4 +1,4 @@
-// Copyright 2021 Vector 35 Inc.
+// Copyright 2021-2022 Vector 35 Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,9 +18,8 @@ use crate::helpers::*;
 use binaryninja::{
     rc::*,
     types::{
-        Enumeration, EnumerationBuilder, FunctionParameter, MemberAccess, MemberScope,
-        NamedTypeReference, NamedTypeReferenceClass, QualifiedName, Structure, StructureBuilder,
-        StructureType, Type, TypeBuilder,
+        Enumeration, EnumerationBuilder, FunctionParameter, MemberAccess, MemberScope, Structure,
+        StructureBuilder, StructureType, Type, TypeBuilder,
     },
 };
 
@@ -73,9 +72,8 @@ fn do_structure_parse<R: Reader<Offset = usize>>(
 ) -> Option<Ref<Type>> {
     // bn::Types::Structure related things
     //  Steps to parsing a structure:
-    //    Create a phony type representing the structure
     //    Parse the size of the structure and create a Structure instance
-    //    Recurse on the DIE's children to create all their types (any references back to the the current DIE will be NamedTypeReferences to a phony type)
+    //    Recurse on the DIE's children to create all their types (any references back to the the current DIE will be unresolved NamedTypeReferences (gets resolved by the core))
     //    Populate the members of the structure, create a structure_type, and register it with the DebugInfo
 
     // All struct, union, and class types will have:
@@ -117,25 +115,8 @@ fn do_structure_parse<R: Reader<Offset = usize>>(
         return None;
     }
 
-    // First things first, let's register a reference type for this struct for any children to grab while we're still building this type
-    match get_name(&dwarf, &unit, &entry) {
-        Some(name) => {
-            debug_info_builder.add_type(
-                entry.offset(),
-                name.clone(),
-                Type::named_type(&NamedTypeReference::new(
-                    NamedTypeReferenceClass::StructNamedTypeClass,
-                    Type::generate_auto_demangled_type_id(name.clone()),
-                    QualifiedName::from(name),
-                )),
-            );
-        }
-        _ => return None,
-    };
-
     // Create structure with proper size
-    // TODO : Fail if size is not provided
-    let size = get_size_as_u64(&entry).unwrap();
+    let size = get_size_as_u64(&entry).unwrap_or(0);
     let mut structure_builder: StructureBuilder = StructureBuilder::new();
     structure_builder
         .set_width(size)
@@ -182,21 +163,34 @@ fn do_structure_parse<R: Reader<Offset = usize>>(
                     }
                 } else if let Some(child_name) = get_name(&dwarf, &unit, &child.entry()) {
                     println!(
-                        "  Couldn't parse type for member {}",
-                        child_name.to_str().unwrap()
+                        "  Couldn't parse type for member `{}` of `{:?}`",
+                        child_name.to_str().unwrap(),
+                        get_name(&dwarf, &unit, &entry).unwrap_or(CString::new("???").unwrap())
                     );
                 } else {
                     println!("  No name and no type for member");
                 }
             }
+        } else if let Some(_) = get_type(&dwarf, &unit, &child.entry(), &mut debug_info_builder) {
+        } else if child.entry().tag() == constants::DW_TAG_subprogram {
         } else {
-            println!("  Found another tag?");
+            println!(
+                "  Missing structure child type ({:} of {:})",
+                child.entry().tag(),
+                entry.tag()
+            );
+            // Triggering on:
+            //   DW_TAG_enumerator
+            //   DW_TAG_enumeration_type
+            //   DW_TAG_typedef
+            //   DW_TAG_structure_type
+            //   DW_TAG_file_type
+            //   DW_TAG_union_type
+            //   DW_TAG_inheritance
+            //   DW_TAG_const_type
         }
-        // TODO(Long term) : parse DW_TAG_subprogram (the other type of valid child entry) when we have component support
     }
     // End children recursive block
-
-    debug_info_builder.remove_type(entry.offset());
 
     // TODO : Figure out how to make this nicer:
     Some(Type::structure(Structure::new(&structure_builder).as_ref()))
@@ -225,8 +219,13 @@ pub(crate) fn get_type<R: Reader<Offset = usize>>(
     // TODO : Need to consider specification and abstract origin?
     let parent = match entry.attr_value(constants::DW_AT_type) {
         Ok(Some(UnitRef(parent_type_offset))) => {
-            let entry = unit.entry(parent_type_offset).unwrap();
-            get_type(&dwarf, &unit, &entry, &mut debug_info_builder)
+            // typedefs are the devil: do not trust them
+            if entry.tag() == constants::DW_TAG_typedef {
+                None
+            } else {
+                let entry = unit.entry(parent_type_offset).unwrap();
+                get_type(&dwarf, &unit, &entry, &mut debug_info_builder)
+            }
         }
         _ => None,
     };
@@ -253,8 +252,10 @@ pub(crate) fn get_type<R: Reader<Offset = usize>>(
 
             // TODO : Namespaces?
             // TODO : By spec base types need to have a name, what if it's spec non-conforming?
-            let name =
-                get_name(&dwarf, &unit, &entry).expect("DW_TAG_base does not have name attribute");
+            let name = get_name(&dwarf, &unit, &entry).unwrap_or_else(|| {
+                CString::new("TODO : 2 Put the commented out line back here instead").unwrap()
+            });
+            // expect("DW_TAG_base does not have name attribute");
 
             // TODO : Handle other size specifiers (bits, offset, high_pc?, etc)
             let size = get_size_as_usize(&entry).expect("DW_TAG_base does not have size attribute");
@@ -347,8 +348,11 @@ pub(crate) fn get_type<R: Reader<Offset = usize>>(
             let mut children = tree.root().unwrap().children();
             while let Ok(Some(child)) = children.next() {
                 if child.entry().tag() == constants::DW_TAG_enumerator {
-                    let name = get_name(&dwarf, &unit, &child.entry())
-                        .expect("DW_TAG_enumeration_type does not have name attribute");
+                    let name = get_name(&dwarf, &unit, &child.entry()).unwrap_or_else(|| {
+                        CString::new("TODO : 3 Put the commented out line back here instead")
+                            .unwrap()
+                    });
+                    // .expect("DW_TAG_enumeration_type does not have name attribute");
                     let value = get_attr_as_u64(
                         child
                             .entry()
@@ -409,6 +413,13 @@ pub(crate) fn get_type<R: Reader<Offset = usize>>(
                     match get_name(&dwarf, &unit, &unit.entry(parent_offset).unwrap()) {
                         Some(name) => Some(Type::pointer_of_width(
                             Type::named_type_from_type(name, parent_type.as_ref()).as_ref(),
+                            // Not sure about the named_type id stuff
+                            // Type::named_type(&NamedTypeReference::new(
+                            //     NamedTypeReferenceClass::UnknownNamedTypeClass,
+                            //     "",
+                            //     QualifiedName::from(name),
+                            // ))
+                            // .as_ref(),
                             pointer_size,
                             false,
                             false,

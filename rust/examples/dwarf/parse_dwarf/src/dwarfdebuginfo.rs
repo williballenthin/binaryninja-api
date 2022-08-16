@@ -143,10 +143,6 @@ impl<T: Eq + Hash + Copy> DebugInfoBuilder<T> {
         }
     }
 
-    // pub fn remove_type(&mut self, type_uid: T) {
-    //     self.types.remove(&type_uid);
-    // }
-
     pub fn contains_type(&self, type_uid: T) -> bool {
         self.types.get(&type_uid).is_some()
     }
