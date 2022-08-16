@@ -8,5 +8,6 @@ edition = "2021"
 crate-type = ["cdylib"]
 
 [dependencies]
-gimli = "0.26.1" 
-binaryninja = { path = "../../" }
+dwarfreader = { path = "../shared/" }
+binaryninja = { path = "../../../" }
+gimli = "0.26.1"

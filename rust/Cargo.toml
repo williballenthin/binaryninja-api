@@ -2,7 +2,7 @@
 name = "binaryninja"
 version = "0.1.0"
 authors = ["Ryan Snyder <ryan@vector35.com>", "Kyle Martin <kyle@vector35.com>"]
-edition = "2018"
+edition = "2021"
 
 [dependencies]
 log = "0.4"
@@ -14,7 +14,10 @@ binaryninjacore-sys = { path = "binaryninjacore-sys" }
 members = [
     "examples/basic_script",
     "examples/decompile",
-    "examples/dwarfdump",
     "examples/flowgraph",
-    "examples/template"
+    "examples/template",
+    "examples/dwarf/dwarfdump",
+    "examples/dwarf/dwarfdump-cli",
+    "examples/dwarf/parse_dwarf",
+    "examples/dwarf/shared"
 ]

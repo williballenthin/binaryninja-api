@@ -1,4 +1,4 @@
-// Copyright 2021 Vector 35 Inc.
+// Copyright 2021-2022 Vector 35 Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@ use binaryninja::rc::*;
 use binaryninja::types::Type;
 
 use std::collections::{hash_map::Values, HashMap};
-use std::hash::Hash;
 use std::ffi::CString;
+use std::hash::Hash;
 
 /////////////////////////
 // FunctionInfoBuilder
@@ -143,9 +143,9 @@ impl<T: Eq + Hash + Copy> DebugInfoBuilder<T> {
         }
     }
 
-    pub fn remove_type(&mut self, type_uid: T) {
-        self.types.remove(&type_uid);
-    }
+    // pub fn remove_type(&mut self, type_uid: T) {
+    //     self.types.remove(&type_uid);
+    // }
 
     pub fn contains_type(&self, type_uid: T) -> bool {
         self.types.get(&type_uid).is_some()

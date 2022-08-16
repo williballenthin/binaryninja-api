@@ -1,4 +1,4 @@
-// Copyright 2021 Vector 35 Inc.
+// Copyright 2021-2022 Vector 35 Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-mod dwarfreader;
 mod types;
 use crate::types::get_type;
 
@@ -30,7 +29,10 @@ use binaryninja::{
     rc::Ref,
 };
 
-use gimli::{constants, DebuggingInformationEntry, Dwarf, DwarfFileType, Reader, Unit, UnitOffset};
+use gimli::{
+    constants, AttributeValue::UnitRef, DebuggingInformationEntry, Dwarf, DwarfFileType, Reader,
+    Unit, UnitOffset,
+};
 
 use std::ffi::CString;
 
@@ -130,7 +132,32 @@ fn parse_unit<R: Reader<Offset = usize>>(
 
         match entry.tag() {
             constants::DW_TAG_namespace => {
-                namespace_qualifiers.push((depth, get_name(&dwarf, &unit, &entry).unwrap()))
+                fn resolve_namespace_name<R: Reader>(
+                    dwarf: &Dwarf<R>,
+                    unit: &Unit<R>,
+                    entry: &DebuggingInformationEntry<R>,
+                    namespace_qualifiers: &mut Vec<(isize, CString)>,
+                    depth: isize,
+                ) {
+                    if let Some(namespace_qualifier) = get_name(&dwarf, &unit, &entry) {
+                        namespace_qualifiers.push((depth, namespace_qualifier));
+                    } else if let Ok(Some(UnitRef(offset))) =
+                        entry.attr_value(constants::DW_AT_extension)
+                    {
+                        resolve_namespace_name(
+                            dwarf,
+                            unit,
+                            &unit.entry(offset).unwrap(),
+                            namespace_qualifiers,
+                            depth,
+                        );
+                    } else {
+                        namespace_qualifiers
+                            .push((depth, CString::new("anonymous_namespace").unwrap()));
+                    }
+                }
+
+                resolve_namespace_name(dwarf, unit, entry, &mut namespace_qualifiers, depth);
             }
             constants::DW_TAG_class_type => {
                 namespace_qualifiers.push((depth, get_name(&dwarf, &unit, &entry).unwrap()))
@@ -139,6 +166,8 @@ fn parse_unit<R: Reader<Offset = usize>>(
                 // TODO : Is this necessary?
                 if let Some(name) = get_name(&dwarf, &unit, &entry) {
                     namespace_qualifiers.push((depth, name))
+                } else {
+                    namespace_qualifiers.push((depth, CString::new("anonymous_structure").unwrap()))
                 }
             }
             constants::DW_TAG_subprogram => parse_function_entry(

@@ -1,4 +1,4 @@
-// Copyright 2021 Vector 35 Inc.
+// Copyright 2021-2022 Vector 35 Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ use gimli::{
 
 use std::ffi::CString;
 
-use crate::dwarfreader::DWARFReader;
+use dwarfreader::DWARFReader;
 
 //////////////////////
 // Dwarf Validation
@@ -47,7 +47,7 @@ pub(crate) fn is_parent_non_dwo_dwarf(view: &BinaryView) -> bool {
 
 pub(crate) fn is_parent_dwo_dwarf(view: &BinaryView) -> bool {
     if let Ok(parent_view) = view.parent_view() {
-        parent_view.section_by_name(".debug_info").is_ok()
+        parent_view.section_by_name(".debug_info.dwo").is_ok()
     } else {
         false
     }

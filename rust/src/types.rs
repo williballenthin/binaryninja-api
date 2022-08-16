@@ -433,17 +433,17 @@ impl TypeBuilder {
         }
     }
 
-    pub fn named_type_from_type<S: BnStrCompatible>(name: S, t: &Type) -> Self {
-        let mut name = QualifiedName::from(name);
+    // pub fn named_type_from_type<S: BnStrCompatible>(name: S, t: &Type) -> Self {
+    //     let mut name = QualifiedName::from(name);
 
-        unsafe {
-            Self::from_raw(BNCreateNamedTypeReferenceBuilderFromTypeAndId(
-                BnString::new("").as_ptr() as *mut _,
-                &mut name.0,
-                t.handle,
-            ))
-        }
-    }
+    //     unsafe {
+    //         Self::from_raw(BNCreateNamedTypeReferenceBuilderFromTypeAndId(
+    //             BnString::new("").as_ptr() as *mut _,
+    //             &mut name.0,
+    //             t.handle,
+    //         ))
+    //     }
+    // }
 
     // TODO : BNCreateFunctionTypeBuilder
 
