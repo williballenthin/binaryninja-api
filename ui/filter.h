@@ -43,6 +43,7 @@ class BINARYNINJAUIAPI FilteredView : public QWidget
 	void setFilterPlaceholderText(const QString& text);
 	void updateFonts();
 	void clearFilter();
+	void setFilter(QString filterText);
 	void showFilter(const QString& initialText);
 
 	static bool match(const std::string& name, const std::string& filter);
