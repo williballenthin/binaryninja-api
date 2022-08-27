@@ -1572,17 +1572,25 @@ impl NamedTypeReference {
         Self { handle }
     }
 
-    pub fn new<S: BnStrCompatible>(
-        type_class: NamedTypeReferenceClass,
-        type_id: S,
-        mut name: QualifiedName,
-    ) -> Self {
-        let type_id = type_id.as_bytes_with_nul();
+    // pub(crate) fn new_with_id<S: BnStrCompatible>(
+    //     type_class: NamedTypeReferenceClass,
+    //     type_id: S,
+    //     mut name: QualifiedName,
+    // ) -> Self {
+    //     let type_id = type_id.as_bytes_with_nul();
 
+    //     Self {
+    //         handle: unsafe {
+    //             BNCreateNamedType(type_class, type_id.as_ref().as_ptr() as _, &mut name.0)
+    //         },
+    //     }
+    // }
+
+    /// Most people should use this: The core "should" figure out the type ID for you
+    /// TODO : Check with Peter about what a better description would be
+    pub fn new(type_class: NamedTypeReferenceClass, mut name: QualifiedName) -> Self {
         Self {
-            handle: unsafe {
-                BNCreateNamedType(type_class, type_id.as_ref().as_ptr() as _, &mut name.0)
-            },
+            handle: unsafe { BNCreateNamedType(type_class, "".as_ptr() as _, &mut name.0) },
         }
     }
 }

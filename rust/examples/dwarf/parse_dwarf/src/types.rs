@@ -29,6 +29,7 @@ use gimli::{
     DebuggingInformationEntry, Dwarf, Reader, Unit, UnitOffset,
 };
 
+use binaryninja::types::{NamedTypeReference, NamedTypeReferenceClass, QualifiedName};
 use std::ffi::CString;
 
 // Type tags in hello world:
@@ -115,6 +116,22 @@ fn do_structure_parse<R: Reader<Offset = usize>>(
         return None;
     }
 
+    // First things first, let's register a reference type for this struct for any children to grab while we're still building this type
+    match get_name(&dwarf, &unit, &entry) {
+        Some(name) => {
+            println!("Add type 1");
+            debug_info_builder.add_type(
+                entry.offset(),
+                name.clone(),
+                Type::named_type(&NamedTypeReference::new(
+                    NamedTypeReferenceClass::StructNamedTypeClass,
+                    QualifiedName::from(name),
+                )),
+            );
+        }
+        _ => return None,
+    };
+
     // Create structure with proper size
     let size = get_size_as_u64(&entry).unwrap_or(0);
     let mut structure_builder: StructureBuilder = StructureBuilder::new();
@@ -131,6 +148,7 @@ fn do_structure_parse<R: Reader<Offset = usize>>(
                 child.entry().attr_value(constants::DW_AT_type)
             {
                 let child_type_entry = unit.entry(child_type_offset).unwrap();
+                println!("  get_type : 1");
                 if let Some(child_type_id) =
                     get_type(&dwarf, &unit, &child_type_entry, &mut debug_info_builder)
                 {
@@ -171,7 +189,10 @@ fn do_structure_parse<R: Reader<Offset = usize>>(
                     println!("  No name and no type for member");
                 }
             }
-        } else if let Some(_) = get_type(&dwarf, &unit, &child.entry(), &mut debug_info_builder) {
+        } else if let Some(_) = {
+            println!("  get_type : 2");
+            get_type(&dwarf, &unit, &child.entry(), &mut debug_info_builder)
+        } {
         } else if child.entry().tag() == constants::DW_TAG_subprogram {
         } else {
             println!(
@@ -192,6 +213,8 @@ fn do_structure_parse<R: Reader<Offset = usize>>(
     }
     // End children recursive block
 
+    debug_info_builder.remove_type(entry.offset());
+
     // TODO : Figure out how to make this nicer:
     Some(Type::structure(Structure::new(&structure_builder).as_ref()))
 }
@@ -204,24 +227,33 @@ pub(crate) fn get_type<R: Reader<Offset = usize>>(
     entry: &DebuggingInformationEntry<R>,
     mut debug_info_builder: &mut DebugInfoBuilder<UnitOffset>,
 ) -> Option<UnitOffset> {
+    println!(
+        "Parsing: #0x{:08x}",
+        match entry.offset().to_unit_section_offset(unit) {
+            gimli::UnitSectionOffset::DebugInfoOffset(o) => o.0,
+            gimli::UnitSectionOffset::DebugTypesOffset(o) => o.0,
+        }
+    );
+
     // If this node (and thus all its referenced nodes) has already been processed, just return the offset
     if debug_info_builder.contains_type(entry.offset()) {
         return Some(entry.offset());
     }
-
-    // let label_value = match entry.offset().to_unit_section_offset(unit) {
-    //     UnitSectionOffset::DebugInfoOffset(o) => o.0,
-    //     UnitSectionOffset::DebugTypesOffset(o) => o.0,
-    // };
-    // println!("Parsing: #0x{:08x}", label_value);
 
     // Recurse
     // TODO : Need to consider specification and abstract origin?
     let parent = match entry.attr_value(constants::DW_AT_type) {
         Ok(Some(UnitRef(parent_type_offset))) => {
             // typedefs are the devil: do not trust them
+            // Typedefs should be transparent; typedefs mask the base type they refer to, not other typedefs
             if entry.tag() == constants::DW_TAG_typedef {
-                None
+                let mut parent = entry.clone(); // TODO : Murder the crows?
+                while let Ok(Some(UnitRef(parent_type_offset))) =
+                    parent.attr_value(constants::DW_AT_type)
+                {
+                    parent = unit.entry(parent_type_offset).unwrap();
+                }
+                get_type(&dwarf, &unit, &parent, &mut debug_info_builder)
             } else {
                 let entry = unit.entry(parent_type_offset).unwrap();
                 get_type(&dwarf, &unit, &entry, &mut debug_info_builder)
@@ -374,6 +406,7 @@ pub(crate) fn get_type<R: Reader<Offset = usize>>(
 
         // Basic types
         constants::DW_TAG_typedef => {
+            println!("  Typedef");
             // All base types have:
             //   DW_AT_name
             //   *DW_AT_type
@@ -507,10 +540,13 @@ pub(crate) fn get_type<R: Reader<Offset = usize>>(
             let mut children = tree.root().unwrap().children();
             while let Ok(Some(child)) = children.next() {
                 if child.entry().tag() == constants::DW_TAG_formal_parameter {
-                    if let (Some(child_uid), Some(name)) = (
-                        get_type(&dwarf, &unit, &child.entry(), &mut debug_info_builder),
-                        get_name(&dwarf, &unit, &child.entry()),
-                    ) {
+                    if let (Some(child_uid), Some(name)) = {
+                        println!("  get_type : 5");
+                        (
+                            get_type(&dwarf, &unit, &child.entry(), &mut debug_info_builder),
+                            get_name(&dwarf, &unit, &child.entry()),
+                        )
+                    } {
                         let child_type = debug_info_builder.get_type(child_uid).unwrap().1;
                         parameters.push(FunctionParameter::new(
                             child_type,
@@ -579,9 +615,18 @@ pub(crate) fn get_type<R: Reader<Offset = usize>>(
         _ => None,
     };
 
+    println!(
+        "Finishing up with: #0x{:08x}",
+        match entry.offset().to_unit_section_offset(unit) {
+            gimli::UnitSectionOffset::DebugInfoOffset(o) => o.0,
+            gimli::UnitSectionOffset::DebugTypesOffset(o) => o.0,
+        }
+    );
+
     // Wrap our resultant type in a TypeInfo so that the internal DebugInfo class can manage it
     // TODO : Figure out what to do with the name field
     if let Some(type_def) = type_def {
+        println!("Add type 2");
         debug_info_builder.add_type(
             entry.offset(),
             get_name(&dwarf, &unit, &entry).unwrap_or_else(|| CString::new("").unwrap()), // Something smarter than ::new("")?

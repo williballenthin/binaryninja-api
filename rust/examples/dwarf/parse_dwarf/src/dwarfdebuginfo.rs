@@ -135,6 +135,10 @@ impl<T: Eq + Hash + Copy> DebugInfoBuilder<T> {
         assert!(self.types.insert(type_uid, (name, t)).is_none());
     }
 
+    pub fn remove_type(&mut self, type_uid: T) {
+        self.types.remove(&type_uid);
+    }
+
     // TODO : Non-copy?
     pub fn get_type(&self, type_uid: T) -> Option<(CString, Ref<Type>)> {
         match self.types.get(&type_uid) {

@@ -19,5 +19,6 @@ members = [
     "examples/dwarf/dwarfdump",
     "examples/dwarf/dwarfdump-cli",
     "examples/dwarf/parse_dwarf",
-    "examples/dwarf/shared"
+    "examples/dwarf/shared",
+    "examples/dwarf/test-gimli-bug"
 ]
