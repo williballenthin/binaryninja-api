@@ -6,6 +6,7 @@
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QTextEdit>
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QListWidget>
 #include "binaryninjaapi.h"
 #include "uicontext.h"
 
@@ -14,27 +15,30 @@ class BINARYNINJAUIAPI CreateArrayDialog : public QDialog
 	Q_OBJECT
 
 	QComboBox* m_mode;
-	QLineEdit* m_type, *m_size;
-	QLabel* m_typeLabel, *m_sizeLabel;
+	QLineEdit* m_type, *m_size, *m_address;
+	QLabel* m_typeLabel, *m_sizeLabel, *m_addressLabel;
 	QTextEdit* m_errors;
 	QPushButton* m_acceptButton;
+	QListWidget* m_dataVariableList;
 
 	BinaryViewRef m_view;
 	BinaryNinja::Ref<BinaryNinja::Type> m_resultType;
+	uint64_t m_highestAddress, m_lowestAddress;
+	bool m_sizeMismatch{false};
+	std::vector<BinaryNinja::DataVariable> m_dataVariables;
 
 public:
 	using CursorPositions = std::pair<LinearViewCursorPosition, LinearViewCursorPosition>;
 
 	enum Mode : uint8_t
 	{
-		FillToSize = 0,
-		FillToSizeWithType,
-		FillToEndOfSection,
-		FillToNextDataVariable,
+		Default = 0,
+		FillToSegment,
+		FillToDataVariable,
 	};
 
 	CreateArrayDialog(QWidget* parent, BinaryViewRef view, const CursorPositions& cursorPositions,
-		Mode initialMode = Mode::FillToSize);
+		std::vector<BinaryNinja::DataVariable> dataVariables, Mode initialMode = Mode::Default);
 
 	BinaryNinja::Ref<BinaryNinja::Type> getType() { return m_resultType; }
 
@@ -49,9 +53,30 @@ public:
 		return 0;
 	}
 
+	uint64_t getAddress()
+	{
+		bool ok{false};
+		const auto sz = m_address->text().toULongLong(&ok, 16);
+		if (ok)
+			return sz;
+		return 0;
+	}
+
+	std::optional<BinaryNinja::DataVariable> getSelectedDataVariable()
+	{
+		if (const auto item = m_dataVariableList->currentItem())
+			return m_dataVariables.at(m_dataVariableList->currentIndex().row());
+
+		return std::nullopt;
+	}
+
 private:
+	void sizeChanged(const QString& size);
+	void addressChanged(const QString& address);
+
+	void itemSelectionChanged();
 	void resetLabels();
-	void setContent(const CursorPositions& cursorPositions);
+	void setSegmentLabels();
 	void accepted();
 	void indexChanged(int);
 };
