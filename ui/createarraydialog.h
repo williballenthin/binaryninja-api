@@ -15,8 +15,8 @@ class BINARYNINJAUIAPI CreateArrayDialog : public QDialog
 	Q_OBJECT
 
 	QComboBox* m_mode;
-	QLineEdit* m_type, *m_size, *m_address;
-	QLabel* m_typeLabel, *m_sizeLabel, *m_addressLabel;
+	QLineEdit* m_type, *m_size, *m_address, *m_startAddress;
+	QLabel* m_typeLabel, *m_sizeLabel, *m_addressLabel, *m_startAddressLabel;
 	QTextEdit* m_errors;
 	QPushButton* m_acceptButton;
 	QListWidget* m_dataVariableList;
@@ -33,7 +33,6 @@ public:
 	enum Mode : uint8_t
 	{
 		Default = 0,
-		FillToSegment,
 		FillToDataVariable,
 	};
 
@@ -73,10 +72,10 @@ public:
 private:
 	void sizeChanged(const QString& size);
 	void addressChanged(const QString& address);
+	void typeChanged(const QString& type);
 
 	void itemSelectionChanged();
 	void resetLabels();
-	void setSegmentLabels();
 	void accepted();
 	void indexChanged(int);
 };
