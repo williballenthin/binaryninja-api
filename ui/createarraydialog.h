@@ -76,6 +76,7 @@ private:
 
 	void itemSelectionChanged();
 	void resetLabels();
+	void updateDataVariables();
 	void accepted();
 	void indexChanged(int);
 };
