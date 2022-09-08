@@ -20,6 +20,7 @@ class BINARYNINJAUIAPI CreateArrayDialog : public QDialog
 	QTextEdit* m_errors;
 	QPushButton* m_acceptButton;
 	QListWidget* m_dataVariableList;
+	QCheckBox* m_consumeSelection;
 
 	BinaryViewRef m_view;
 	BinaryNinja::Ref<BinaryNinja::Type> m_resultType;
@@ -42,6 +43,8 @@ public:
 	BinaryNinja::Ref<BinaryNinja::Type> getType() { return m_resultType; }
 
 	Mode getMode() { return static_cast<Mode>(m_mode->currentIndex()); }
+
+	bool shouldConsumeSelection() { return m_consumeSelection->isChecked(); }
 
 	size_t getSize()
 	{
