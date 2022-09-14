@@ -33,12 +33,12 @@ public:
 
 	enum Mode : uint8_t
 	{
-		Default = 0,
+		Manual = 0,
 		FillToDataVariable,
 	};
 
 	CreateArrayDialog(QWidget* parent, BinaryViewRef view, const CursorPositions& cursorPositions,
-		std::vector<BinaryNinja::DataVariable> dataVariables, Mode initialMode = Mode::Default);
+		std::vector<BinaryNinja::DataVariable> dataVariables, Mode initialMode = Mode::Manual);
 
 	BinaryNinja::Ref<BinaryNinja::Type> getType() { return m_resultType; }
 
