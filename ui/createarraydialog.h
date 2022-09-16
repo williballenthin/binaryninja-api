@@ -14,7 +14,6 @@ class BINARYNINJAUIAPI CreateArrayDialog : public QDialog
 {
 	Q_OBJECT
 
-	QComboBox* m_mode;
 	QLineEdit* m_type, *m_size, *m_address, *m_startAddress;
 	QLabel* m_typeLabel, *m_sizeLabel, *m_addressLabel, *m_startAddressLabel;
 	QTextEdit* m_errors;
@@ -37,12 +36,14 @@ public:
 		FillToDataVariable,
 	};
 
+	Mode m_mode;
+
 	CreateArrayDialog(QWidget* parent, BinaryViewRef view, const CursorPositions& cursorPositions,
 		std::vector<BinaryNinja::DataVariable> dataVariables, Mode initialMode = Mode::Manual);
 
 	BinaryNinja::Ref<BinaryNinja::Type> getType() { return m_resultType; }
 
-	Mode getMode() { return static_cast<Mode>(m_mode->currentIndex()); }
+	Mode getMode() { return m_mode; }
 
 	bool shouldConsumeSelection() { return m_consumeSelection->isChecked(); }
 
@@ -81,5 +82,4 @@ private:
 	void resetLabels();
 	void updateDataVariables();
 	void accepted();
-	void indexChanged(int);
 };
