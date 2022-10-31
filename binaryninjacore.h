@@ -243,6 +243,7 @@ extern "C"
 	struct BNDebugInfoParser;
 	struct BNSecretsProvider;
 	struct BNLogger;
+	struct BNDemangler;
 
 
 	//! Console log levels
@@ -2893,6 +2894,15 @@ extern "C"
 	{
 		void* context;
 		void (*licenseStatusChanged)(void* ctxt, bool stillValid);
+	};
+
+	struct BNDemanglerCallbacks
+	{
+		void* context;
+		bool (*isMangledString)(void* ctxt, const char* name);
+		bool (*demangle)(void* ctxt, BNArchitecture* arch, const char* name, BNType** outType,
+			BNQualifiedName* outVarName, BNBinaryView* view, bool simplify);
+		void (*freeVarName)(void* ctxt, BNQualifiedName* name);
 	};
 
 	BINARYNINJACOREAPI char* BNAllocString(const char* contents);
@@ -6372,6 +6382,18 @@ extern "C"
 	BINARYNINJACOREAPI char* BNGetSecretsProviderData(BNSecretsProvider* provider, const char* key);
 	BINARYNINJACOREAPI bool BNStoreSecretsProviderData(BNSecretsProvider* provider, const char* key, const char* data);
 	BINARYNINJACOREAPI bool BNDeleteSecretsProviderData(BNSecretsProvider* provider, const char* key);
+
+	// Demangler plugins
+	BINARYNINJACOREAPI BNDemangler* BNRegisterDemangler(const char* name, BNDemanglerCallbacks* callbacks);
+	BINARYNINJACOREAPI BNDemangler** BNGetDemanglerList(size_t* count);
+	BINARYNINJACOREAPI void BNFreeDemanglerList(BNDemangler** demanglers);
+	BINARYNINJACOREAPI BNDemangler* BNGetDemanglerByName(const char* name);
+
+	BINARYNINJACOREAPI char* BNGetDemanglerName(BNDemangler* demangler);
+
+	BINARYNINJACOREAPI bool BNIsDemanglerMangledName(BNDemangler* demangler, const char* name);
+	BINARYNINJACOREAPI bool BNDemanglerDemangle(BNDemangler* demangler, BNArchitecture* arch, const char* name,
+		BNType** outType, BNQualifiedName* outVarName, BNBinaryView* view, bool simplify);
 
 #ifdef __cplusplus
 }
