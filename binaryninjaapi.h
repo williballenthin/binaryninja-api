@@ -2034,7 +2034,8 @@ namespace BinaryNinja {
 			void* ctxt, BNBinaryView* data, BNComponent* formerParent, BNComponent* newParent, BNComponent* component);
 		static void ComponentFunctionAddedCallback(void* ctxt, BNBinaryView* data, BNComponent* component, BNFunction* function);
 		static void ComponentFunctionRemovedCallback(void* ctxt, BNBinaryView* data, BNComponent* component, BNFunction* function);
-
+		static void ComponentDataVariableAddedCallback(void* ctxt, BNBinaryView* data, BNComponent* component, BNDataVariable* var);
+		static void ComponentDataVariableRemovedCallback(void* ctxt, BNBinaryView* data, BNComponent* component, BNDataVariable* var);
 
 	  public:
 		BinaryDataNotification();
@@ -2287,6 +2288,32 @@ namespace BinaryNinja {
 			(void)data;
 			(void)component;
 			(void)function;
+		}
+
+		/*! This notification is posted whenever a DataVariable is added to a Component
+
+		    \param data BinaryView containing the Component and DataVariable
+		    \param component Component the DataVariable was added to
+		    \param var The DataVariable which was added
+		 */
+		virtual void OnComponentDataVariableAdded(BinaryView* data, Component* component, const DataVariable& var)
+		{
+			(void)data;
+			(void)component;
+			(void)var;
+		}
+
+		/*! This notification is posted whenever a DataVariable is removed from a Component
+
+		    \param data BinaryView containing the Component and DataVariable
+		    \param component Component the DataVariable was removed from
+		    \param var The DataVariable which was removed
+		 */
+		virtual void OnComponentDataVariableRemoved(BinaryView* data, Component* component, const DataVariable& var)
+		{
+			(void)data;
+			(void)component;
+			(void)var;
 		}
 	};
 
@@ -4293,6 +4320,9 @@ namespace BinaryNinja {
 			\return Whether removal was successful
 		*/
 		bool RemoveComponent(std::string guid);
+
+		std::vector<Ref<Component>> GetFunctionParentComponents(Ref<Function> function) const;
+		std::vector<Ref<Component>> GetDataVariableParentComponents(DataVariable var) const;
 
 		/*! Check whether the given architecture supports assembling instructions
 
@@ -8478,7 +8508,6 @@ namespace BinaryNinja {
 			\return Whether this function needs update
 		*/
 		bool NeedsUpdate() const;
-		std::vector<Ref<Component>> GetParentComponents() const;
 
 		/*! Get a list of Basic Blocks for this function
 
@@ -14714,6 +14743,8 @@ namespace BinaryNinja {
 		*/
 		bool AddComponent(Ref<Component> component);
 
+		bool AddDataVariable(DataVariable dataVariable);
+
 		/*! Remove a Component from this Component, moving it to the root component.
 
 			This will not remove a component from the tree entirely.
@@ -14732,6 +14763,8 @@ namespace BinaryNinja {
 		*/
 		bool RemoveFunction(Ref<Function> func);
 
+		bool RemoveDataVariable(DataVariable dataVariable);
+
 		/*! Get a list of types referenced by the functions in this Component.
 
 			\return vector of Type objects
@@ -14749,6 +14782,12 @@ namespace BinaryNinja {
 			\return vector of Function objects
 		*/
 		std::vector<Ref<Function>> GetContainedFunctions();
+
+		/*! Get a list of datavariables added to this component
+
+			\return list of DataVariables
+		*/
+		std::vector<DataVariable> GetContainedDataVariables();
 
 		/*! Get a list of DataVariables referenced by the functions in this Component.
 
