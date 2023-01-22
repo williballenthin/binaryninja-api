@@ -115,6 +115,9 @@ class LinearView;
 
 class StickyHeader: public QWidget
 {
+	Q_OBJECT
+
+	LinearView* m_parent;
 	RenderContext m_render;
 	BinaryViewRef m_data;
 
@@ -129,6 +132,10 @@ public:
 	void updateFonts();
 
 	virtual void paintEvent(QPaintEvent* event) override;
+	virtual void mousePressEvent(QMouseEvent* event) override;
+
+Q_SIGNALS:
+	void forwardableMouseEvent(LinearViewLine, HighlightTokenState, QMouseEvent*);
 };
 
 
@@ -378,6 +385,8 @@ private Q_SLOTS:
 	void instrEditDoneEvent();
 
 	void setCurrentVariableDeadStoreElimination(BNDeadStoreElimination elimination);
+
+	void stickyHeaderClicked(LinearViewLine, HighlightTokenState, QMouseEvent*);
 
 Q_SIGNALS:
 	void notifyResizeEvent(int width, int height);
