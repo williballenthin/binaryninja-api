@@ -348,6 +348,7 @@ extern "C"
 		IndentationToken = 33,
 		UnknownMemoryToken = 34,
 		EnumerationMemberToken = 35,
+		BraceToken = 36,
 		// The following are output by the analysis system automatically, these should
 		// not be used directly by the architecture plugins
 		CodeSymbolToken = 64,
