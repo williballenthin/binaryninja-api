@@ -347,9 +347,9 @@ class BINARYNINJAUIAPI SettingsScopeBar : public QWidget
 	Q_OBJECT
 
 	QPushButton* m_userLabel;
-	BinaryViewScopeLabel* m_projectLabel;
+	//BinaryViewScopeLabel* m_projectLabel;
 	BinaryViewScopeLabel* m_resourceLabel;
-	ClickableLabel* m_openProjectLabel;
+	//ClickableLabel* m_openProjectLabel;
 	QLabel* m_desc;
 	unsigned long m_highlightIdx;
 

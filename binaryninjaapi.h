@@ -1896,10 +1896,6 @@ namespace BinaryNinja {
 		std::optional<std::string> GetLastRedoEntryTitle();
 		void ClearUndoEntries();
 
-		bool OpenProject();
-		void CloseProject();
-		bool IsProjectOpen();
-
 		/*! Get the current View name, e.g. ``Linear:ELF``, ``Graph:PE``
 
 		    \return The current view name
@@ -13919,7 +13915,7 @@ namespace BinaryNinja {
 			================= ========================== ============== ==============================================
 			Default           SettingsDefaultScope       Lowest         Settings Schema
 			User              SettingsUserScope          -              <User Directory>/settings.json
-			Project           SettingsProjectScope       -              <Project Directory>/.binaryninja/settings.json
+			Project           SettingsProjectScope       -              <Project Directory>/settings.json
 			Resource          SettingsResourceScope      Highest        Raw BinaryView (Storage in BNDB)
 			================= ========================== ============== ==============================================
 

@@ -497,14 +497,6 @@ class FileMetadata:
 				return None
 		return binaryview.BinaryView(file_metadata=self, handle=view)
 
-	def open_project(self) -> bool:
-		return core.BNOpenProject(self.handle)
-
-	def close_project(self) -> None:
-		core.BNCloseProject(self.handle)
-
-	def is_project_open(self) -> bool:
-		return core.BNIsProjectOpen(self.handle)
 
 	@property
 	def existing_views(self) -> List[ViewName]:

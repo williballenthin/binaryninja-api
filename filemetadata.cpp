@@ -450,24 +450,6 @@ void FileMetadata::ClearUndoEntries()
 }
 
 
-bool FileMetadata::OpenProject()
-{
-	return BNOpenProject(m_object);
-}
-
-
-void FileMetadata::CloseProject()
-{
-	BNCloseProject(m_object);
-}
-
-
-bool FileMetadata::IsProjectOpen()
-{
-	return BNIsProjectOpen(m_object);
-}
-
-
 string FileMetadata::GetCurrentView()
 {
 	char* view = BNGetCurrentView(m_object);
