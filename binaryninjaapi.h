@@ -1666,6 +1666,76 @@ namespace BinaryNinja {
 		void WriteAnalysisCache(Ref<KeyValueStore> val);
 	};
 
+
+	/*!
+
+		\ingroup project
+	*/
+	struct ProjectException : std::runtime_error
+	{
+		ProjectException(const std::string& desc) : std::runtime_error(desc.c_str()) {}
+	};
+
+
+	/*!
+
+	\ingroup project
+	*/
+		class ProjectFolder : public CoreRefCountObject<BNProjectFolder, BNNewProjectFolderReference, BNFreeProjectFolder>
+	{
+	public:
+		ProjectFolder(BNProjectFolder* folder);
+
+		std::string GetId() const;
+		std::string GetName() const;
+		Ref<ProjectFolder> GetParent() const;
+		void SetParent(Ref<ProjectFolder> parent);
+	};
+
+
+	/*!
+
+	\ingroup project
+	*/
+		class ProjectFile : public CoreRefCountObject<BNProjectFile, BNNewProjectFileReference, BNFreeProjectFile>
+	{
+	public:
+		ProjectFile(BNProjectFile* file);
+
+		std::string GetPath() const;
+		std::string GetName() const;
+		std::string GetId() const;
+		Ref<ProjectFolder> GetFolder() const;
+		void SetFolder(Ref<ProjectFolder> folder);
+	};
+
+
+	/*!
+
+		\ingroup project
+	*/
+	class Project : public CoreRefCountObject<BNProject, BNNewProjectReference, BNFreeProject>
+	{
+	  public:
+		Project(BNProject* project);
+
+		Ref<ProjectFile> AddFile(const std::string& srcPath, Ref<ProjectFolder> folder, const std::string& name);
+		Ref<ProjectFolder> AddFolder(Ref<ProjectFolder> parent, const std::string& name);
+
+		std::string GetPath() const;
+
+		std::vector<Ref<ProjectFile>> GetFiles() const;
+		Ref<ProjectFile> GetFileById(const std::string& id) const;
+
+		std::vector<Ref<ProjectFolder>> GetFolders() const;
+		std::vector<Ref<ProjectFolder>> GetSortedFolders() const;
+		Ref<ProjectFolder> GetFolderById(const std::string& id) const;
+
+		static Ref<Project> CreateProject(const std::string& path);
+		static Ref<Project> OpenProject(const std::string& path);
+	};
+
+
 	/*!
 
 		\ingroup undo

@@ -258,6 +258,9 @@ extern "C"
 	struct BNSecretsProvider;
 	struct BNLogger;
 	struct BNSymbolQueue;
+	struct BNProject;
+	struct BNProjectFile;
+	struct BNProjectFolder;
 
 
 	//! Console log levels
@@ -3170,6 +3173,38 @@ extern "C"
 	BINARYNINJACOREAPI size_t BNGetKeyValueStoreDataSize(BNKeyValueStore* store);
 	BINARYNINJACOREAPI size_t BNGetKeyValueStoreValueStorageSize(BNKeyValueStore* store);
 	BINARYNINJACOREAPI size_t BNGetKeyValueStoreNamespaceSize(BNKeyValueStore* store);
+
+	// Project object
+	BINARYNINJACOREAPI BNProject* BNNewProjectReference(BNProject* project);
+	BINARYNINJACOREAPI void BNFreeProject(BNProject* project);
+	BINARYNINJACOREAPI BNProject* BNCreateProject(const char* path);
+	BINARYNINJACOREAPI BNProject* BNOpenProject(const char* path);
+	BINARYNINJACOREAPI char* BNProjectGetPath(BNProject* project);
+	BINARYNINJACOREAPI BNProjectFile* BNProjectAddFile(BNProject* project, const char* srcPath, BNProjectFolder* folder, const char* name);
+	BINARYNINJACOREAPI BNProjectFolder* BNProjectAddFolder(BNProject* project, BNProjectFolder* parent, const char* name);
+	BINARYNINJACOREAPI BNProjectFile** BNProjectGetFiles(BNProject* project, size_t* count);
+	BINARYNINJACOREAPI BNProjectFile* BNProjectGetFileById(BNProject* project, const char* id);
+	BINARYNINJACOREAPI BNProjectFolder** BNProjectGetFolders(BNProject* project, size_t* count);
+	BINARYNINJACOREAPI BNProjectFolder* BNProjectGetFolderById(BNProject* project, const char* id);
+
+	// ProjectFile object
+	BINARYNINJACOREAPI BNProjectFile* BNNewProjectFileReference(BNProjectFile* file);
+	BINARYNINJACOREAPI void BNFreeProjectFile(BNProjectFile* file);
+	BINARYNINJACOREAPI void BNFreeProjectFileList(BNProjectFile** files, size_t count);
+	BINARYNINJACOREAPI char* BNProjectFileGetPath(BNProjectFile* file);
+	BINARYNINJACOREAPI char* BNProjectFileGetName(BNProjectFile* file);
+	BINARYNINJACOREAPI char* BNProjectFileGetId(BNProjectFile* file);
+	BINARYNINJACOREAPI BNProjectFolder* BNProjectFileGetFolder(BNProjectFile* file);
+	BINARYNINJACOREAPI void BNProjectFileSetFolder(BNProjectFile* file, BNProjectFolder* folder);
+
+	// ProjectFolder object
+	BINARYNINJACOREAPI BNProjectFolder* BNNewProjectFolderReference(BNProjectFolder* folder);
+	BINARYNINJACOREAPI void BNFreeProjectFolder(BNProjectFolder* folder);
+	BINARYNINJACOREAPI void BNFreeProjectFolderList(BNProjectFolder** folders, size_t count);
+	BINARYNINJACOREAPI char* BNProjectFolderGetId(BNProjectFolder* folder);
+	BINARYNINJACOREAPI char* BNProjectFolderGetName(BNProjectFolder* folder);
+	BINARYNINJACOREAPI BNProjectFolder* BNProjectFolderGetParent(BNProjectFolder* folder);
+	BINARYNINJACOREAPI void BNProjectFolderSetParent(BNProjectFolder* folder, BNProjectFolder* parent);
 
 	// Database object
 	BINARYNINJACOREAPI BNDatabase* BNNewDatabaseReference(BNDatabase* database);
