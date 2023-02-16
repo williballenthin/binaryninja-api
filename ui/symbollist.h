@@ -234,6 +234,7 @@ class BINARYNINJAUIAPI SymbolListModel : public QAbstractItemModel, public Binar
 	BinaryNinja::Ref<SymbolListUpdate> m_backgroundDestroy;
 	volatile bool m_backgroundUpdateComplete;
 	std::unique_ptr<std::deque<NamedObject>> m_backgroundUpdateFuncs;
+	std::unique_ptr<std::deque<NamedObject>> m_backgroundCurSyms;
 
 	bool m_showImports;
 	bool m_showExportedDataVars;
