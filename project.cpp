@@ -47,18 +47,18 @@ Ref<Project> Project::OpenProject(const std::string& path)
 }
 
 
-Ref<ProjectFile> Project::AddFile(const std::string& srcPath, Ref<ProjectFolder> folder, const std::string& name)
+Ref<ProjectFile> Project::CreateFile(const std::string& srcPath, Ref<ProjectFolder> folder, const std::string& name)
 {
-	BNProjectFile* file = BNProjectAddFile(m_object, srcPath.c_str(), folder ? folder->m_object : nullptr, name.c_str());
+	BNProjectFile* file = BNProjectCreateFile(m_object, srcPath.c_str(), folder ? folder->m_object : nullptr, name.c_str());
 	if (file == nullptr)
 		return nullptr;
 	return new ProjectFile(file);
 }
 
 
-Ref<ProjectFolder> Project::AddFolder(Ref<ProjectFolder> parent, const std::string& name)
+Ref<ProjectFolder> Project::CreateFolder(Ref<ProjectFolder> parent, const std::string& name)
 {
-	BNProjectFolder* folder = BNProjectAddFolder(m_object, parent ? parent->m_object : nullptr, name.c_str());
+	BNProjectFolder* folder = BNProjectCreateFolder(m_object, parent ? parent->m_object : nullptr, name.c_str());
 	if (folder == nullptr)
 		return nullptr;
 	return new ProjectFolder(folder);
@@ -68,6 +68,13 @@ Ref<ProjectFolder> Project::AddFolder(Ref<ProjectFolder> parent, const std::stri
 std::string Project::GetPath() const
 {
 	return BNProjectGetPath(m_object);
+}
+
+
+bool Project::PathExists(Ref<ProjectFolder> folder, const std::string& name) const
+{
+	LogWarn("Path exists called");
+	return false;
 }
 
 
@@ -194,6 +201,12 @@ std::string ProjectFile::GetName() const
 }
 
 
+void ProjectFile::SetName(const std::string& name)
+{
+	BNProjectFileSetName(m_object, name.c_str());
+}
+
+
 std::string ProjectFile::GetId() const
 {
 	return BNProjectFileGetId(m_object);
@@ -215,6 +228,18 @@ void ProjectFile::SetFolder(Ref<ProjectFolder> folder)
 }
 
 
+void ProjectFile::Delete()
+{
+	BNProjectFileDelete(m_object);
+}
+
+
+void ProjectFile::Save()
+{
+	BNProjectFileSave(m_object);
+}
+
+
 ProjectFolder::ProjectFolder(BNProjectFolder* folder)
 {
 	m_object = folder;
@@ -233,6 +258,12 @@ std::string ProjectFolder::GetName() const
 }
 
 
+void ProjectFolder::SetName(const std::string& name)
+{
+	BNProjectFolderSetName(m_object, name.c_str());
+}
+
+
 Ref<ProjectFolder> ProjectFolder::GetParent() const
 {
 	BNProjectFolder* parent = BNProjectFolderGetParent(m_object);
@@ -245,4 +276,16 @@ Ref<ProjectFolder> ProjectFolder::GetParent() const
 void ProjectFolder::SetParent(Ref<ProjectFolder> parent)
 {
 	BNProjectFolderSetParent(m_object, parent ? parent->m_object : nullptr);
+}
+
+
+void ProjectFolder::Delete()
+{
+	BNProjectFolderDelete(m_object);
+}
+
+
+void ProjectFolder::Save()
+{
+	BNProjectFolderSave(m_object);
 }

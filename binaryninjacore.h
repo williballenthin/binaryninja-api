@@ -3180,8 +3180,8 @@ extern "C"
 	BINARYNINJACOREAPI BNProject* BNCreateProject(const char* path);
 	BINARYNINJACOREAPI BNProject* BNOpenProject(const char* path);
 	BINARYNINJACOREAPI char* BNProjectGetPath(BNProject* project);
-	BINARYNINJACOREAPI BNProjectFile* BNProjectAddFile(BNProject* project, const char* srcPath, BNProjectFolder* folder, const char* name);
-	BINARYNINJACOREAPI BNProjectFolder* BNProjectAddFolder(BNProject* project, BNProjectFolder* parent, const char* name);
+	BINARYNINJACOREAPI BNProjectFile* BNProjectCreateFile(BNProject* project, const char* srcPath, BNProjectFolder* folder, const char* name);
+	BINARYNINJACOREAPI BNProjectFolder* BNProjectCreateFolder(BNProject* project, BNProjectFolder* parent, const char* name);
 	BINARYNINJACOREAPI BNProjectFile** BNProjectGetFiles(BNProject* project, size_t* count);
 	BINARYNINJACOREAPI BNProjectFile* BNProjectGetFileById(BNProject* project, const char* id);
 	BINARYNINJACOREAPI BNProjectFolder** BNProjectGetFolders(BNProject* project, size_t* count);
@@ -3193,9 +3193,12 @@ extern "C"
 	BINARYNINJACOREAPI void BNFreeProjectFileList(BNProjectFile** files, size_t count);
 	BINARYNINJACOREAPI char* BNProjectFileGetPath(BNProjectFile* file);
 	BINARYNINJACOREAPI char* BNProjectFileGetName(BNProjectFile* file);
+	BINARYNINJACOREAPI void BNProjectFileSetName(BNProjectFile* file, const char* name);
 	BINARYNINJACOREAPI char* BNProjectFileGetId(BNProjectFile* file);
 	BINARYNINJACOREAPI BNProjectFolder* BNProjectFileGetFolder(BNProjectFile* file);
 	BINARYNINJACOREAPI void BNProjectFileSetFolder(BNProjectFile* file, BNProjectFolder* folder);
+	BINARYNINJACOREAPI void BNProjectFileDelete(BNProjectFile* file);
+	BINARYNINJACOREAPI void BNProjectFileSave(BNProjectFile* file);
 
 	// ProjectFolder object
 	BINARYNINJACOREAPI BNProjectFolder* BNNewProjectFolderReference(BNProjectFolder* folder);
@@ -3203,8 +3206,11 @@ extern "C"
 	BINARYNINJACOREAPI void BNFreeProjectFolderList(BNProjectFolder** folders, size_t count);
 	BINARYNINJACOREAPI char* BNProjectFolderGetId(BNProjectFolder* folder);
 	BINARYNINJACOREAPI char* BNProjectFolderGetName(BNProjectFolder* folder);
+	BINARYNINJACOREAPI void BNProjectFolderSetName(BNProjectFolder* folder, const char* name);
 	BINARYNINJACOREAPI BNProjectFolder* BNProjectFolderGetParent(BNProjectFolder* folder);
 	BINARYNINJACOREAPI void BNProjectFolderSetParent(BNProjectFolder* folder, BNProjectFolder* parent);
+	BINARYNINJACOREAPI void BNProjectFolderDelete(BNProjectFolder* folder);
+	BINARYNINJACOREAPI void BNProjectFolderSave(BNProjectFolder* folder);
 
 	// Database object
 	BINARYNINJACOREAPI BNDatabase* BNNewDatabaseReference(BNDatabase* database);

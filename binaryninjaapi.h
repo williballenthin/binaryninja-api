@@ -1688,8 +1688,11 @@ namespace BinaryNinja {
 
 		std::string GetId() const;
 		std::string GetName() const;
+		void SetName(const std::string& name);
 		Ref<ProjectFolder> GetParent() const;
 		void SetParent(Ref<ProjectFolder> parent);
+		void Delete();
+		void Save();
 	};
 
 
@@ -1704,9 +1707,12 @@ namespace BinaryNinja {
 
 		std::string GetPath() const;
 		std::string GetName() const;
+		void SetName(const std::string& name);
 		std::string GetId() const;
 		Ref<ProjectFolder> GetFolder() const;
 		void SetFolder(Ref<ProjectFolder> folder);
+		void Delete();
+		void Save();
 	};
 
 
@@ -1719,10 +1725,11 @@ namespace BinaryNinja {
 	  public:
 		Project(BNProject* project);
 
-		Ref<ProjectFile> AddFile(const std::string& srcPath, Ref<ProjectFolder> folder, const std::string& name);
-		Ref<ProjectFolder> AddFolder(Ref<ProjectFolder> parent, const std::string& name);
+		Ref<ProjectFile> CreateFile(const std::string& srcPath, Ref<ProjectFolder> folder, const std::string& name);
+		Ref<ProjectFolder> CreateFolder(Ref<ProjectFolder> parent, const std::string& name);
 
 		std::string GetPath() const;
+		bool PathExists(Ref<ProjectFolder> folder, const std::string& name) const;
 
 		std::vector<Ref<ProjectFile>> GetFiles() const;
 		Ref<ProjectFile> GetFileById(const std::string& id) const;
