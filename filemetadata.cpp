@@ -58,14 +58,22 @@ NavigationHandler::NavigationHandler()
 
 FileMetadata::FileMetadata()
 {
-	m_object = BNCreateFileMetadata();
+	m_object = BNCreateFileMetadata(nullptr);
 }
 
 
 FileMetadata::FileMetadata(const string& filename)
 {
-	m_object = BNCreateFileMetadata();
+	m_object = BNCreateFileMetadata(nullptr);
 	BNSetFilename(m_object, filename.c_str());
+}
+
+
+FileMetadata::FileMetadata(Ref<ProjectFile> projectFile)
+{
+	m_object = BNCreateFileMetadata(nullptr);
+	string filePath = projectFile->GetProject()->GetPath() + projectFile->GetPath();
+	BNSetFilename(m_object, filePath.c_str());
 }
 
 

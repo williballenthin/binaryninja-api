@@ -29,9 +29,9 @@ Project::Project(BNProject* project)
 }
 
 
-Ref<Project> Project::CreateProject(const std::string& path)
+Ref<Project> Project::CreateProject(const std::string& path, const std::string& name)
 {
-	BNProject* bnproj = BNCreateProject(path.c_str());
+	BNProject* bnproj = BNCreateProject(path.c_str(), name.c_str());
 	if (!bnproj)
 		return nullptr;
 	return new Project(bnproj);
@@ -189,6 +189,12 @@ ProjectFile::ProjectFile(BNProjectFile* file)
 }
 
 
+Ref<Project> ProjectFile::GetProject() const
+{
+	return new Project(BNProjectFileGetProject(m_object));
+}
+
+
 std::string ProjectFile::GetPath() const
 {
 	return BNProjectFileGetPath(m_object);
@@ -243,6 +249,12 @@ void ProjectFile::Save()
 ProjectFolder::ProjectFolder(BNProjectFolder* folder)
 {
 	m_object = folder;
+}
+
+
+Ref<Project> ProjectFolder::GetProject() const
+{
+	return new Project(BNProjectFolderGetProject(m_object));
 }
 
 

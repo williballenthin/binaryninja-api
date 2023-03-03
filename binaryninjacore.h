@@ -3123,7 +3123,7 @@ extern "C"
 	BINARYNINJACOREAPI void BNSetSaveSettingsName(BNSaveSettings* settings, const char* name);
 
 	// File metadata object
-	BINARYNINJACOREAPI BNFileMetadata* BNCreateFileMetadata(void);
+	BINARYNINJACOREAPI BNFileMetadata* BNCreateFileMetadata(BNProjectFile* projectFile);
 	BINARYNINJACOREAPI BNFileMetadata* BNNewFileReference(BNFileMetadata* file);
 	BINARYNINJACOREAPI void BNFreeFileMetadata(BNFileMetadata* file);
 	BINARYNINJACOREAPI void BNCloseFile(BNFileMetadata* file);
@@ -3177,7 +3177,7 @@ extern "C"
 	// Project object
 	BINARYNINJACOREAPI BNProject* BNNewProjectReference(BNProject* project);
 	BINARYNINJACOREAPI void BNFreeProject(BNProject* project);
-	BINARYNINJACOREAPI BNProject* BNCreateProject(const char* path);
+	BINARYNINJACOREAPI BNProject* BNCreateProject(const char* path, const char* name);
 	BINARYNINJACOREAPI BNProject* BNOpenProject(const char* path);
 	BINARYNINJACOREAPI char* BNProjectGetPath(BNProject* project);
 	BINARYNINJACOREAPI BNProjectFile* BNProjectCreateFile(BNProject* project, const char* srcPath, BNProjectFolder* folder, const char* name);
@@ -3199,6 +3199,7 @@ extern "C"
 	BINARYNINJACOREAPI void BNProjectFileSetFolder(BNProjectFile* file, BNProjectFolder* folder);
 	BINARYNINJACOREAPI void BNProjectFileDelete(BNProjectFile* file);
 	BINARYNINJACOREAPI void BNProjectFileSave(BNProjectFile* file);
+	BINARYNINJACOREAPI BNProject* BNProjectFileGetProject(BNProjectFile* file);
 
 	// ProjectFolder object
 	BINARYNINJACOREAPI BNProjectFolder* BNNewProjectFolderReference(BNProjectFolder* folder);
@@ -3211,6 +3212,7 @@ extern "C"
 	BINARYNINJACOREAPI void BNProjectFolderSetParent(BNProjectFolder* folder, BNProjectFolder* parent);
 	BINARYNINJACOREAPI void BNProjectFolderDelete(BNProjectFolder* folder);
 	BINARYNINJACOREAPI void BNProjectFolderSave(BNProjectFolder* folder);
+	BINARYNINJACOREAPI BNProject* BNProjectFolderGetProject(BNProjectFolder* folder);
 
 	// Database object
 	BINARYNINJACOREAPI BNDatabase* BNNewDatabaseReference(BNDatabase* database);

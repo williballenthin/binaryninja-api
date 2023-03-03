@@ -1676,6 +1676,7 @@ namespace BinaryNinja {
 		ProjectException(const std::string& desc) : std::runtime_error(desc.c_str()) {}
 	};
 
+	class Project;
 
 	/*!
 
@@ -1686,6 +1687,7 @@ namespace BinaryNinja {
 	public:
 		ProjectFolder(BNProjectFolder* folder);
 
+		Ref<Project> GetProject() const;
 		std::string GetId() const;
 		std::string GetName() const;
 		void SetName(const std::string& name);
@@ -1705,6 +1707,7 @@ namespace BinaryNinja {
 	public:
 		ProjectFile(BNProjectFile* file);
 
+		Ref<Project> GetProject() const;
 		std::string GetPath() const;
 		std::string GetName() const;
 		void SetName(const std::string& name);
@@ -1738,7 +1741,7 @@ namespace BinaryNinja {
 		std::vector<Ref<ProjectFolder>> GetSortedFolders() const;
 		Ref<ProjectFolder> GetFolderById(const std::string& id) const;
 
-		static Ref<Project> CreateProject(const std::string& path);
+		static Ref<Project> CreateProject(const std::string& path, const std::string& name);
 		static Ref<Project> OpenProject(const std::string& path);
 	};
 
@@ -1793,6 +1796,7 @@ namespace BinaryNinja {
 	  public:
 		FileMetadata();
 		FileMetadata(const std::string& filename);
+		FileMetadata(Ref<ProjectFile> projectFile);
 		FileMetadata(BNFileMetadata* file);
 
 		/*! Close the underlying file handle
