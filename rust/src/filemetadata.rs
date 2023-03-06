@@ -19,6 +19,7 @@ use binaryninjacore_sys::{
     BNCreateDatabase,
     BNCreateFileMetadata,
     BNFileMetadata,
+    BNProjectFile,
     BNFreeFileMetadata,
     BNGetCurrentOffset,
     BNGetCurrentView,
@@ -63,7 +64,7 @@ impl FileMetadata {
     pub fn new() -> Ref<Self> {
         unsafe {
             Ref::new(Self {
-                handle: BNCreateFileMetadata(),
+                handle: BNCreateFileMetadata(std::ptr::null_mut::<BNProjectFile>()),
             })
         }
     }
