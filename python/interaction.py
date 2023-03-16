@@ -759,7 +759,14 @@ class InteractionHandler:
 		return NotImplemented
 
 	def get_int_input(self, prompt, title):
-		return NotImplemented
+		while True:
+			text = self.get_text_line_input(prompt, title)
+			if len(text) == 0:
+				return False
+			try:
+				return int(text)
+			except:
+				continue
 
 	def get_address_input(self, prompt, title, view, current_address):
 		return get_int_input(prompt, title)
