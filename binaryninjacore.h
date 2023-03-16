@@ -2692,7 +2692,9 @@ extern "C"
 		bool (*getAddressInput)(void* ctxt, uint64_t* result, const char* prompt, const char* title, BNBinaryView* view,
 		    uint64_t currentAddr);
 		bool (*getChoiceInput)(
-		    void* ctxt, size_t* result, const char* prompt, const char* title, const char** choices, size_t count);
+			void* ctxt, size_t* result, const char* prompt, const char* title, const char** choices, size_t count);
+		bool (*getLargeChoiceInput)(
+			void* ctxt, size_t* result, const char* prompt, const char* title, const char** choices, size_t count);
 		bool (*getOpenFileNameInput)(void* ctxt, char** result, const char* prompt, const char* ext);
 		bool (*getSaveFileNameInput)(
 		    void* ctxt, char** result, const char* prompt, const char* ext, const char* defaultName);
@@ -5979,7 +5981,9 @@ extern "C"
 	BINARYNINJACOREAPI bool BNGetAddressInput(
 	    uint64_t* result, const char* prompt, const char* title, BNBinaryView* view, uint64_t currentAddr);
 	BINARYNINJACOREAPI bool BNGetChoiceInput(
-	    size_t* result, const char* prompt, const char* title, const char** choices, size_t count);
+		size_t* result, const char* prompt, const char* title, const char** choices, size_t count);
+	BINARYNINJACOREAPI bool BNGetLargeChoiceInput(
+		size_t* result, const char* prompt, const char* title, const char** choices, size_t count);
 	BINARYNINJACOREAPI bool BNGetOpenFileNameInput(char** result, const char* prompt, const char* ext);
 	BINARYNINJACOREAPI bool BNGetSaveFileNameInput(
 	    char** result, const char* prompt, const char* ext, const char* defaultName);
