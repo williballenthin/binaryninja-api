@@ -56,6 +56,15 @@ Ref<ProjectFile> Project::CreateFile(const std::string& srcPath, Ref<ProjectFold
 }
 
 
+Ref<ProjectFile> Project::CreateFile(const std::vector<uint8_t>& contents, Ref<ProjectFolder> folder, const std::string& name)
+{
+	BNProjectFile* file = BNProjectCreateFileFromContents(m_object, contents.data(), contents.size(), folder ? folder->m_object : nullptr, name.c_str());
+	if (file == nullptr)
+		return nullptr;
+	return new ProjectFile(file);
+}
+
+
 Ref<ProjectFolder> Project::CreateFolder(Ref<ProjectFolder> parent, const std::string& name)
 {
 	BNProjectFolder* folder = BNProjectCreateFolder(m_object, parent ? parent->m_object : nullptr, name.c_str());
@@ -68,6 +77,18 @@ Ref<ProjectFolder> Project::CreateFolder(Ref<ProjectFolder> parent, const std::s
 std::string Project::GetPath() const
 {
 	return BNProjectGetPath(m_object);
+}
+
+
+std::string Project::GetName() const
+{
+	return BNProjectGetName(m_object);
+}
+
+
+void Project::SetName(const std::string& name)
+{
+	BNProjectSetName(m_object, name.c_str());
 }
 
 
@@ -267,6 +288,12 @@ std::string ProjectFolder::GetId() const
 std::string ProjectFolder::GetName() const
 {
 	return BNProjectFolderGetName(m_object);
+}
+
+
+std::string ProjectFolder::GetPath() const
+{
+	return BNProjectFolderGetPath(m_object);
 }
 
 

@@ -3123,7 +3123,7 @@ extern "C"
 	BINARYNINJACOREAPI void BNSetSaveSettingsName(BNSaveSettings* settings, const char* name);
 
 	// File metadata object
-	BINARYNINJACOREAPI BNFileMetadata* BNCreateFileMetadata(BNProjectFile* projectFile);
+	BINARYNINJACOREAPI BNFileMetadata* BNCreateFileMetadata();
 	BINARYNINJACOREAPI BNFileMetadata* BNNewFileReference(BNFileMetadata* file);
 	BINARYNINJACOREAPI void BNFreeFileMetadata(BNFileMetadata* file);
 	BINARYNINJACOREAPI void BNCloseFile(BNFileMetadata* file);
@@ -3180,7 +3180,10 @@ extern "C"
 	BINARYNINJACOREAPI BNProject* BNCreateProject(const char* path, const char* name);
 	BINARYNINJACOREAPI BNProject* BNOpenProject(const char* path);
 	BINARYNINJACOREAPI char* BNProjectGetPath(BNProject* project);
+	BINARYNINJACOREAPI char* BNProjectGetName(BNProject* project);
+	BINARYNINJACOREAPI void BNProjectSetName(BNProject* project, const char* name);
 	BINARYNINJACOREAPI BNProjectFile* BNProjectCreateFile(BNProject* project, const char* srcPath, BNProjectFolder* folder, const char* name);
+	BINARYNINJACOREAPI BNProjectFile* BNProjectCreateFileFromContents(BNProject* project, const uint8_t* data, const size_t dataLen, BNProjectFolder* folder, const char* name);
 	BINARYNINJACOREAPI BNProjectFolder* BNProjectCreateFolder(BNProject* project, BNProjectFolder* parent, const char* name);
 	BINARYNINJACOREAPI BNProjectFile** BNProjectGetFiles(BNProject* project, size_t* count);
 	BINARYNINJACOREAPI BNProjectFile* BNProjectGetFileById(BNProject* project, const char* id);
@@ -3208,6 +3211,7 @@ extern "C"
 	BINARYNINJACOREAPI char* BNProjectFolderGetId(BNProjectFolder* folder);
 	BINARYNINJACOREAPI char* BNProjectFolderGetName(BNProjectFolder* folder);
 	BINARYNINJACOREAPI void BNProjectFolderSetName(BNProjectFolder* folder, const char* name);
+	BINARYNINJACOREAPI char* BNProjectFolderGetPath(BNProjectFolder* folder);
 	BINARYNINJACOREAPI BNProjectFolder* BNProjectFolderGetParent(BNProjectFolder* folder);
 	BINARYNINJACOREAPI void BNProjectFolderSetParent(BNProjectFolder* folder, BNProjectFolder* parent);
 	BINARYNINJACOREAPI void BNProjectFolderDelete(BNProjectFolder* folder);
@@ -3276,6 +3280,9 @@ extern "C"
 
 	BINARYNINJACOREAPI char* BNGetFilename(BNFileMetadata* file);
 	BINARYNINJACOREAPI void BNSetFilename(BNFileMetadata* file, const char* name);
+
+	BINARYNINJACOREAPI BNProjectFile* BNGetProjectFile(BNFileMetadata* file);
+	BINARYNINJACOREAPI void BNSetProjectFile(BNFileMetadata* file, BNProjectFile* pfile);
 
 	BINARYNINJACOREAPI void BNBeginUndoActions(BNFileMetadata* file);
 	BINARYNINJACOREAPI void BNCommitUndoActions(BNFileMetadata* file);

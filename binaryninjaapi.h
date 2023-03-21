@@ -1690,6 +1690,7 @@ namespace BinaryNinja {
 		Ref<Project> GetProject() const;
 		std::string GetId() const;
 		std::string GetName() const;
+		std::string GetPath() const;
 		void SetName(const std::string& name);
 		Ref<ProjectFolder> GetParent() const;
 		void SetParent(Ref<ProjectFolder> parent);
@@ -1729,9 +1730,13 @@ namespace BinaryNinja {
 		Project(BNProject* project);
 
 		Ref<ProjectFile> CreateFile(const std::string& srcPath, Ref<ProjectFolder> folder, const std::string& name);
+		Ref<ProjectFile> CreateFile(const std::vector<uint8_t>& contents, Ref<ProjectFolder> folder, const std::string& name);
 		Ref<ProjectFolder> CreateFolder(Ref<ProjectFolder> parent, const std::string& name);
 
 		std::string GetPath() const;
+		std::string GetName() const;
+		void SetName(const std::string& name);
+
 		bool PathExists(Ref<ProjectFolder> folder, const std::string& name) const;
 
 		std::vector<Ref<ProjectFile>> GetFiles() const;
@@ -2033,6 +2038,8 @@ namespace BinaryNinja {
 		    \param data the binary view to unregister
 		*/
 		void UnregisterViewOfType(const std::string& type, BinaryNinja::Ref<BinaryNinja::BinaryView> data);
+
+		Ref<ProjectFile> GetProjectFile() const;
 	};
 
 	class Function;

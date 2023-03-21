@@ -64,7 +64,7 @@ impl FileMetadata {
     pub fn new() -> Ref<Self> {
         unsafe {
             Ref::new(Self {
-                handle: BNCreateFileMetadata(std::ptr::null_mut::<BNProjectFile>()),
+                handle: BNCreateFileMetadata(),
             })
         }
     }
