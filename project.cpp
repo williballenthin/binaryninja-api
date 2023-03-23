@@ -19,6 +19,7 @@
 // IN THE SOFTWARE.
 #include <cstring>
 #include "binaryninjaapi.h"
+#include "binaryninjacore.h"
 
 using namespace BinaryNinja;
 
@@ -34,7 +35,7 @@ Ref<Project> Project::CreateProject(const std::string& path, const std::string& 
 	BNProject* bnproj = BNCreateProject(path.c_str(), name.c_str());
 	if (!bnproj)
 		return nullptr;
-	return new Project(bnproj);
+	return new Project(BNNewProjectReference(bnproj));
 }
 
 
@@ -43,34 +44,7 @@ Ref<Project> Project::OpenProject(const std::string& path)
 	BNProject* bnproj = BNOpenProject(path.c_str());
 	if (!bnproj)
 		return nullptr;
-	return new Project(bnproj);
-}
-
-
-Ref<ProjectFile> Project::CreateFile(const std::string& srcPath, Ref<ProjectFolder> folder, const std::string& name)
-{
-	BNProjectFile* file = BNProjectCreateFile(m_object, srcPath.c_str(), folder ? folder->m_object : nullptr, name.c_str());
-	if (file == nullptr)
-		return nullptr;
-	return new ProjectFile(file);
-}
-
-
-Ref<ProjectFile> Project::CreateFile(const std::vector<uint8_t>& contents, Ref<ProjectFolder> folder, const std::string& name)
-{
-	BNProjectFile* file = BNProjectCreateFileFromContents(m_object, contents.data(), contents.size(), folder ? folder->m_object : nullptr, name.c_str());
-	if (file == nullptr)
-		return nullptr;
-	return new ProjectFile(file);
-}
-
-
-Ref<ProjectFolder> Project::CreateFolder(Ref<ProjectFolder> parent, const std::string& name)
-{
-	BNProjectFolder* folder = BNProjectCreateFolder(m_object, parent ? parent->m_object : nullptr, name.c_str());
-	if (folder == nullptr)
-		return nullptr;
-	return new ProjectFolder(folder);
+	return new Project(BNNewProjectReference(bnproj));
 }
 
 
@@ -99,99 +73,12 @@ bool Project::PathExists(Ref<ProjectFolder> folder, const std::string& name) con
 }
 
 
-std::vector<Ref<ProjectFile>> Project::GetFiles() const
+Ref<ProjectBinary> Project::GetBinaryById(const std::string& id) const
 {
-	std::vector<Ref<ProjectFile>> out;
-
-	size_t count = 0;
-	BNProjectFile** files = BNProjectGetFiles(m_object, &count);
-	std::vector<Ref<ProjectFile>> result;
-	for (size_t i = 0; i < count; i++)
-	{
-		BNProjectFile* temp = files[i];
-		result.push_back(new ProjectFile(BNNewProjectFileReference(temp)));
-
-	}
-	BNFreeProjectFileList(files, count);
-	return result;
-}
-
-
-Ref<ProjectFile> Project::GetFileById(const std::string& id) const
-{
-	BNProjectFile* file = BNProjectGetFileById(m_object, id.c_str());
+	BNProjectBinary* file = BNProjectGetBinaryById(m_object, id.c_str());
 	if (file == nullptr)
 		return nullptr;
-	return new ProjectFile(file);
-}
-
-
-std::vector<Ref<ProjectFolder>> Project::GetFolders() const
-{
-	std::vector<Ref<ProjectFolder>> out;
-
-	size_t count = 0;
-	BNProjectFolder** folders = BNProjectGetFolders(m_object, &count);
-	std::vector<Ref<ProjectFolder>> result;
-	for (size_t i = 0; i < count; i++)
-	{
-		BNProjectFolder* temp = folders[i];
-		result.push_back(new ProjectFolder(BNNewProjectFolderReference(temp)));
-
-	}
-	BNFreeProjectFolderList(folders, count);
-	return result;
-}
-
-
-std::vector<Ref<ProjectFolder>> Project::GetSortedFolders() const
-{
-	auto sortedFolders = GetFolders();
-	std::sort(sortedFolders.begin(), sortedFolders.end(), [](const Ref<ProjectFolder>& lhs, const Ref<ProjectFolder>& rhs) {
-		// ensure strict weak ordering because that's VERY IMPORTANT
-		if (lhs == rhs)
-			return false;
-
-		if (!lhs)
-			throw ProjectException("Failed to sort folders, lhs is null");
-		if (!rhs)
-			throw ProjectException("Failed to sort folders, rhs is null");
-
-		auto lhsParent = lhs->GetParent();
-		auto rhsParent = rhs->GetParent();
-		if (!lhsParent)
-		{
-			if (rhsParent)
-			{
-				// Left is root, right is not root
-				return true;
-			}
-			else
-			{
-				// Left is root, right is root
-				return lhs->GetId() < rhs->GetId();
-			}
-		}
-		else if (!rhsParent)
-		{
-			// Left is not root, right is root
-			return false;
-		}
-
-		// Left is not root, right is not root
-
-		// check if rhs is in parent tree of lhs
-		while (lhsParent)
-		{
-			if (lhsParent->GetId() == rhs->GetId())
-			{
-				return false;
-			}
-			lhsParent = lhsParent->GetParent();
-		}
-		return true;
-	});
-	return sortedFolders;
+	return new ProjectBinary(BNNewProjectBinaryReference(file));
 }
 
 
@@ -200,70 +87,70 @@ Ref<ProjectFolder> Project::GetFolderById(const std::string& id) const
 	BNProjectFolder* folder = BNProjectGetFolderById(m_object, id.c_str());
 	if (folder == nullptr)
 		return nullptr;
-	return new ProjectFolder(folder);
+	return new ProjectFolder(BNNewProjectFolderReference(folder));
 }
 
 
-ProjectFile::ProjectFile(BNProjectFile* file)
+ProjectBinary::ProjectBinary(BNProjectBinary* binary)
 {
-	m_object = file;
+	m_object = binary;
 }
 
 
-Ref<Project> ProjectFile::GetProject() const
+Ref<Project> ProjectBinary::GetProject() const
 {
-	return new Project(BNProjectFileGetProject(m_object));
+	return new Project(BNProjectBinaryGetProject(m_object));
 }
 
 
-std::string ProjectFile::GetPath() const
+std::string ProjectBinary::GetPathOnDisk() const
 {
-	return BNProjectFileGetPath(m_object);
+	return BNProjectBinaryGetPathOnDisk(m_object);
 }
 
 
-std::string ProjectFile::GetName() const
+std::string ProjectBinary::GetName() const
 {
-	return BNProjectFileGetName(m_object);
+	return BNProjectBinaryGetName(m_object);
 }
 
 
-void ProjectFile::SetName(const std::string& name)
+void ProjectBinary::SetName(const std::string& name)
 {
-	BNProjectFileSetName(m_object, name.c_str());
+	BNProjectBinarySetName(m_object, name.c_str());
 }
 
 
-std::string ProjectFile::GetId() const
+std::string ProjectBinary::GetId() const
 {
-	return BNProjectFileGetId(m_object);
+	return BNProjectBinaryGetId(m_object);
 }
 
 
-Ref<ProjectFolder> ProjectFile::GetFolder() const
+Ref<ProjectFolder> ProjectBinary::GetFolder() const
 {
-	BNProjectFolder* folder = BNProjectFileGetFolder(m_object);
+	BNProjectFolder* folder = BNProjectBinaryGetFolder(m_object);
 	if (!folder)
 		return nullptr;
-	return new ProjectFolder(folder);
+	return new ProjectFolder(BNNewProjectFolderReference(folder));
 }
 
 
-void ProjectFile::SetFolder(Ref<ProjectFolder> folder)
+void ProjectBinary::SetFolder(Ref<ProjectFolder> folder)
 {
-	BNProjectFileSetFolder(m_object, folder ? folder->m_object : nullptr);
+	BNProjectBinarySetFolder(m_object, folder ? folder->m_object : nullptr);
 }
 
 
-void ProjectFile::Delete()
+void ProjectBinary::Delete()
 {
-	BNProjectFileDelete(m_object);
+	BNProjectBinaryDelete(m_object);
 }
 
 
-void ProjectFile::Save()
+void ProjectBinary::Save()
 {
-	BNProjectFileSave(m_object);
+	BNProjectBinarySave(m_object);
 }
 
 
@@ -291,12 +178,6 @@ std::string ProjectFolder::GetName() const
 }
 
 
-std::string ProjectFolder::GetPath() const
-{
-	return BNProjectFolderGetPath(m_object);
-}
-
-
 void ProjectFolder::SetName(const std::string& name)
 {
 	BNProjectFolderSetName(m_object, name.c_str());
@@ -308,7 +189,7 @@ Ref<ProjectFolder> ProjectFolder::GetParent() const
 	BNProjectFolder* parent = BNProjectFolderGetParent(m_object);
 	if (!parent)
 		return nullptr;
-	return new ProjectFolder(parent);
+	return new ProjectFolder(BNNewProjectFolderReference(parent));
 }
 
 
@@ -327,4 +208,109 @@ void ProjectFolder::Delete()
 void ProjectFolder::Save()
 {
 	BNProjectFolderSave(m_object);
+}
+
+
+std::vector<Ref<ProjectFolder>> ProjectFolder::GetFolders() const
+{
+	size_t count;
+	BNProjectFolder** folders = BNProjectFolderGetFolders(m_object, &count);
+
+	std::vector<Ref<ProjectFolder>> result;
+	result.reserve(count);
+	for (size_t i = 0; i < count; i++)
+	{
+		result.push_back(new ProjectFolder(BNNewProjectFolderReference(folders[i])));
+	}
+
+	BNFreeProjectFolderList(folders, count);
+	return result;
+}
+
+
+std::vector<Ref<ProjectBinary>> ProjectFolder::GetBinaries() const
+{
+	size_t count;
+	BNProjectBinary** binaries = BNProjectFolderGetBinaries(m_object, &count);
+
+	std::vector<Ref<ProjectBinary>> result;
+	result.reserve(count);
+	for (size_t i = 0; i < count; i++)
+	{
+		result.push_back(new ProjectBinary(BNNewProjectBinaryReference(binaries[i])));
+	}
+
+	BNFreeProjectBinaryList(binaries, count);
+	return result;
+}
+
+
+Ref<ProjectFolder> ProjectFolder::AddFolder(const std::string& name)
+{
+	BNProjectFolder* folder = BNProjectFolderAddFolder(m_object, name.c_str());
+	if (!folder)
+		return nullptr;
+	return new ProjectFolder(BNNewProjectFolderReference(folder));
+}
+
+
+Ref<ProjectBinary> ProjectFolder::AddBinary(Ref<FileMetadata> metadata, const std::string &name)
+{
+	BNProjectBinary* binary = BNProjectFolderAddBinary(m_object, metadata->m_object, name.c_str());
+	if (!binary)
+		return nullptr;
+	return new ProjectBinary(BNNewProjectBinaryReference(binary));
+}
+
+
+Ref<ProjectFolder> Project::AddFolder(Ref<ProjectFolder> parent, const std::string& name)
+{
+	BNProjectFolder* folder = BNProjectAddFolder(m_object, parent ? parent->m_object : nullptr, name.c_str());
+	if (!folder)
+		return nullptr;
+	return new ProjectFolder(BNNewProjectFolderReference(folder));
+}
+
+
+Ref<ProjectBinary> Project::AddBinary(Ref<FileMetadata> metadata, Ref<ProjectFolder> folder, const std::string &name)
+{
+	BNProjectBinary* binary = BNProjectAddBinary(m_object, metadata->m_object, folder ? folder->m_object : nullptr, name.c_str());
+	if (!binary)
+		return nullptr;
+	return new ProjectBinary(BNNewProjectBinaryReference(binary));
+}
+
+
+std::vector<Ref<ProjectBinary>> Project::GetTopLevelBinaries() const
+{
+	size_t count;
+	BNProjectBinary** binaries = BNProjectGetTopLevelBinaries(m_object, &count);
+
+	std::vector<Ref<ProjectBinary>> result;
+	result.reserve(count);
+	for (size_t i = 0; i < count; i++)
+	{
+		result.push_back(new ProjectBinary(BNNewProjectBinaryReference(binaries[i])));
+	}
+
+	BNFreeProjectBinaryList(binaries, count);
+	return result;
+}
+
+
+std::vector<Ref<ProjectFolder>> Project::GetTopLevelFolders() const
+{
+	size_t count;
+	BNProjectFolder** folders = BNProjectGetTopLevelFolders(m_object, &count);
+
+	std::vector<Ref<ProjectFolder>> result;
+	result.reserve(count);
+	for (size_t i = 0; i < count; i++)
+	{
+		printf("deep in api land %s\n", BNProjectFolderGetId(folders[i]));
+		result.push_back(new ProjectFolder(BNNewProjectFolderReference(folders[i])));
+	}
+
+	BNFreeProjectFolderList(folders, count);
+	return result;
 }

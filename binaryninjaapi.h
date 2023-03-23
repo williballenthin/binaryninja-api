@@ -1677,6 +1677,7 @@ namespace BinaryNinja {
 	};
 
 	class Project;
+	class ProjectBinary;
 
 	/*!
 
@@ -1690,12 +1691,17 @@ namespace BinaryNinja {
 		Ref<Project> GetProject() const;
 		std::string GetId() const;
 		std::string GetName() const;
-		std::string GetPath() const;
 		void SetName(const std::string& name);
 		Ref<ProjectFolder> GetParent() const;
 		void SetParent(Ref<ProjectFolder> parent);
 		void Delete();
 		void Save();
+
+		std::vector<Ref<ProjectFolder>> GetFolders() const;
+		std::vector<Ref<ProjectBinary>> GetBinaries() const;
+
+		Ref<ProjectBinary> AddBinary(Ref<FileMetadata> metadata, const std::string& name);
+		Ref<ProjectFolder> AddFolder(const std::string& name);
 	};
 
 
@@ -1703,13 +1709,13 @@ namespace BinaryNinja {
 
 	\ingroup project
 	*/
-		class ProjectFile : public CoreRefCountObject<BNProjectFile, BNNewProjectFileReference, BNFreeProjectFile>
+		class ProjectBinary : public CoreRefCountObject<BNProjectBinary, BNNewProjectBinaryReference, BNFreeProjectBinary>
 	{
 	public:
-		ProjectFile(BNProjectFile* file);
+		ProjectBinary(BNProjectBinary* binary);
 
 		Ref<Project> GetProject() const;
-		std::string GetPath() const;
+		std::string GetPathOnDisk() const;
 		std::string GetName() const;
 		void SetName(const std::string& name);
 		std::string GetId() const;
@@ -1729,21 +1735,19 @@ namespace BinaryNinja {
 	  public:
 		Project(BNProject* project);
 
-		Ref<ProjectFile> CreateFile(const std::string& srcPath, Ref<ProjectFolder> folder, const std::string& name);
-		Ref<ProjectFile> CreateFile(const std::vector<uint8_t>& contents, Ref<ProjectFolder> folder, const std::string& name);
-		Ref<ProjectFolder> CreateFolder(Ref<ProjectFolder> parent, const std::string& name);
-
 		std::string GetPath() const;
 		std::string GetName() const;
 		void SetName(const std::string& name);
 
 		bool PathExists(Ref<ProjectFolder> folder, const std::string& name) const;
 
-		std::vector<Ref<ProjectFile>> GetFiles() const;
-		Ref<ProjectFile> GetFileById(const std::string& id) const;
+		std::vector<Ref<ProjectFolder>> GetTopLevelFolders() const;
+		std::vector<Ref<ProjectBinary>> GetTopLevelBinaries() const;
 
-		std::vector<Ref<ProjectFolder>> GetFolders() const;
-		std::vector<Ref<ProjectFolder>> GetSortedFolders() const;
+		Ref<ProjectBinary> AddBinary(Ref<FileMetadata> metadata, Ref<ProjectFolder> folder, const std::string& name);
+		Ref<ProjectFolder> AddFolder(Ref<ProjectFolder> folder, const std::string& name);
+
+		Ref<ProjectBinary> GetBinaryById(const std::string& id) const;
 		Ref<ProjectFolder> GetFolderById(const std::string& id) const;
 
 		static Ref<Project> CreateProject(const std::string& path, const std::string& name);
@@ -1801,7 +1805,7 @@ namespace BinaryNinja {
 	  public:
 		FileMetadata();
 		FileMetadata(const std::string& filename);
-		FileMetadata(Ref<ProjectFile> projectFile);
+		FileMetadata(Ref<ProjectBinary> projectBinary);
 		FileMetadata(BNFileMetadata* file);
 
 		/*! Close the underlying file handle
@@ -2039,7 +2043,7 @@ namespace BinaryNinja {
 		*/
 		void UnregisterViewOfType(const std::string& type, BinaryNinja::Ref<BinaryNinja::BinaryView> data);
 
-		Ref<ProjectFile> GetProjectFile() const;
+		Ref<ProjectBinary> GetProjectBinary() const;
 	};
 
 	class Function;

@@ -19,7 +19,6 @@ use binaryninjacore_sys::{
     BNCreateDatabase,
     BNCreateFileMetadata,
     BNFileMetadata,
-    BNProjectFile,
     BNFreeFileMetadata,
     BNGetCurrentOffset,
     BNGetCurrentView,

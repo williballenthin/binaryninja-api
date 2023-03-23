@@ -70,12 +70,12 @@ FileMetadata::FileMetadata(const string& filename)
 }
 
 
-FileMetadata::FileMetadata(Ref<ProjectFile> projectFile)
+FileMetadata::FileMetadata(Ref<ProjectBinary> projectBinary)
 {
-	printf("File metadata project file %s\n", projectFile->GetPath().c_str());
+	printf("File metadata project file %s\n", projectBinary->GetPathOnDisk().c_str());
 	m_object = BNCreateFileMetadata();
-	BNSetProjectFile(m_object, projectFile->m_object);
-	BNSetFilename(m_object, projectFile->GetPath().c_str());
+	BNSetProjectBinary(m_object, projectBinary->m_object);
+	BNSetFilename(m_object, projectBinary->GetPathOnDisk().c_str());
 }
 
 
@@ -522,12 +522,12 @@ void FileMetadata::UnregisterViewOfType(const std::string& type, BinaryNinja::Re
 }
 
 
-Ref<ProjectFile> FileMetadata::GetProjectFile() const
+Ref<ProjectBinary> FileMetadata::GetProjectBinary() const
 {
-	BNProjectFile* pf = BNGetProjectFile(m_object);
-	if (!pf)
+	BNProjectBinary* bin = BNGetProjectBinary(m_object);
+	if (!bin)
 		return nullptr;
-	return new ProjectFile(pf);
+	return new ProjectBinary(bin);
 }
 
 
